@@ -421,26 +421,26 @@ void CPathFinding::SearchJumpPoint(Node* vNode, EDir searchDir)
 		case EDir::RU:
 			isJumpPoint |= (CheckObstacle(y, x - 1) && !CheckObstacle(y - 1, x - 1));
 			isJumpPoint |= (CheckObstacle(y + 1, x) && !CheckObstacle(y + 1, x + 1));
-			isJumpPoint |= HasCorner_R(vNode, y, x);
-			isJumpPoint |= HasCorner_U(vNode, y, x);
+			isJumpPoint |= HasCorner(vNode, EDir::R, y, x);
+			isJumpPoint |= HasCorner(vNode, EDir::U, y, x);
 			break;
 		case EDir::RD:
 			isJumpPoint |= (CheckObstacle(y, x - 1) && !CheckObstacle(y + 1, x - 1));
 			isJumpPoint |= (CheckObstacle(y - 1, x) && !CheckObstacle(y - 1, x + 1));
-			isJumpPoint |= HasCorner_R(vNode, y, x);
-			isJumpPoint |= HasCorner_D(vNode, y, x);
+			isJumpPoint |= HasCorner(vNode, EDir::R, y, x);
+			isJumpPoint |= HasCorner(vNode, EDir::D, y, x);
 			break;
 		case EDir::LU:
 			isJumpPoint |= (CheckObstacle(y, x + 1) && !CheckObstacle(y - 1, x + 1));
 			isJumpPoint |= (CheckObstacle(y + 1, x) && !CheckObstacle(y + 1, x - 1));
-			isJumpPoint |= HasCorner_L(vNode, y, x);
-			isJumpPoint |= HasCorner_U(vNode, y, x);
+			isJumpPoint |= HasCorner(vNode, EDir::L, y, x);
+			isJumpPoint |= HasCorner(vNode, EDir::U, y, x);
 			break;
 		case EDir::LD:
 			isJumpPoint |= (CheckObstacle(y, x + 1) && !CheckObstacle(y + 1, x + 1));
 			isJumpPoint |= (CheckObstacle(y - 1, x) && !CheckObstacle(y - 1, x - 1));
-			isJumpPoint |= HasCorner_L(vNode, y, x);
-			isJumpPoint |= HasCorner_D(vNode, y, x);
+			isJumpPoint |= HasCorner(vNode, EDir::L, y, x);
+			isJumpPoint |= HasCorner(vNode, EDir::D, y, x);
 			break;
 		}
 		
@@ -517,10 +517,17 @@ void CPathFinding::SearchJumpPoint(Node* vNode, EDir searchDir)
 }
 
 
-bool CPathFinding::HasCorner_R(Node* vNode, int sy, int sx)
+bool CPathFinding::HasCorner(Node* vNode, EDir searchDir, int sy, int sx)
 {
-	int x = sx + 1;
-	int y = sy;
+	int x;
+	int y;
+	switch (searchDir)
+	{
+	case EDir::R:	x = sx + 1;		y = sy;			break;
+	case EDir::U:	x = sx;			y = sy - 1;		break;
+	case EDir::L:	x = sx - 1;		y = sy;			break;
+	case EDir::D:	x = sx;			y = sy + 1;		break;
+	}
 
 	while (1)
 	{
@@ -530,8 +537,26 @@ bool CPathFinding::HasCorner_R(Node* vNode, int sy, int sx)
 			break;
 		// 코너 발견 또는 목적지 발견
 		bool bHasCorner = false;
-		bHasCorner |= (CheckObstacle(y + 1, x) && !CheckObstacle(y + 1, x + 1));
-		bHasCorner |= (CheckObstacle(y - 1, x) && !CheckObstacle(y - 1, x + 1));
+		switch (searchDir)
+		{
+		case EDir::R:
+			bHasCorner |= (CheckObstacle(y + 1, x) && !CheckObstacle(y + 1, x + 1));
+			bHasCorner |= (CheckObstacle(y - 1, x) && !CheckObstacle(y - 1, x + 1));
+			break;
+		case EDir::U:
+			bHasCorner |= (CheckObstacle(y, x + 1) && !CheckObstacle(y - 1, x + 1));
+			bHasCorner |= (CheckObstacle(y, x - 1) && !CheckObstacle(y - 1, x - 1));
+			break;
+		case EDir::L:
+			bHasCorner |= (CheckObstacle(y + 1, x) && !CheckObstacle(y + 1, x - 1));
+			bHasCorner |= (CheckObstacle(y - 1, x) && !CheckObstacle(y - 1, x - 1));
+			break;
+		case EDir::D:
+			bHasCorner |= (CheckObstacle(y, x + 1) && !CheckObstacle(y + 1, x + 1));
+			bHasCorner |= (CheckObstacle(y, x - 1) && !CheckObstacle(y + 1, x - 1));
+			break;
+		}
+
 
 		bool isGoal = (y == endPos.first && x == endPos.second);
 		if (bHasCorner || isGoal)
@@ -545,115 +570,22 @@ bool CPathFinding::HasCorner_R(Node* vNode, int sy, int sx)
 		// ----------- searchGrid 렌더링용 --------------
 		// - 해당 위치에 renderer의 searchGrid에 색상 등록
 		renderer->searchGrid[y][x] = colorMap[vNode];
-		x++;
-	}
-
-	return false;
-}
-
-bool CPathFinding::HasCorner_U(Node* vNode, int sy, int sx)
-{
-	int x = sx;
-	int y = sy - 1;
-	while (1)
-	{
-		if (x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT)
-			break;
-		if (grid[y][x] == 1)
-			break;
-
-		// 코너 발견 또는 목적지 발견
-		bool bHasCorner = false;
-		bHasCorner |= (CheckObstacle(y, x + 1) && !CheckObstacle(y - 1,x + 1));
-		bHasCorner |= (CheckObstacle(y, x - 1) && !CheckObstacle(y - 1, x - 1));
-
-		bool isGoal = (y == endPos.first && x == endPos.second);
-		if (bHasCorner || isGoal)
-		{
-			// ----------- searchGrid 렌더링용 --------------
-			// - 해당 위치에 renderer의 searchGrid에 색상 등록
-			renderer->searchGrid[y][x] = colorMap[vNode];
-			return true;
-		}
 		
-		// ----------- searchGrid 렌더링용 --------------
-		// - 해당 위치에 renderer의 searchGrid에 색상 등록
-		renderer->searchGrid[y][x] = colorMap[vNode];
 
-		y--;
-	}
-
-	return false;
-}
-
-bool CPathFinding::HasCorner_L(Node* vNode, int sy, int sx)
-{
-	int x = sx - 1;
-	int y = sy;
-
-	while (1)
-	{
-		if (x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT)
-			break;
-		if (grid[y][x] == 1)
-			break;
-		// 코너 발견 또는 목적지 발견
-		bool bHasCorner = false;
-		bHasCorner |= (CheckObstacle(y + 1, x) && !CheckObstacle(y + 1, x - 1));
-		bHasCorner |= (CheckObstacle(y - 1, x) && !CheckObstacle(y - 1, x - 1));
-
-		bool isGoal = (y == endPos.first && x == endPos.second);
-		if (bHasCorner || isGoal)
+		// 다음 탐색 좌표 업데이트
+		switch (searchDir)
 		{
-			// ----------- searchGrid 렌더링용 --------------
-			// - 해당 위치에 renderer의 searchGrid에 색상 등록
-			renderer->searchGrid[y][x] = colorMap[vNode];
-			return true;
+		case EDir::R:	x++;	break;
+		case EDir::U:	y--;	break;
+		case EDir::L:	x--;	break;
+		case EDir::D:	y++;	break;
 		}
-
-		// ----------- searchGrid 렌더링용 --------------
-		// - 해당 위치에 renderer의 searchGrid에 색상 등록
-		renderer->searchGrid[y][x] = colorMap[vNode];
-		x--;
 	}
 
 	return false;
 }
 
-bool CPathFinding::HasCorner_D(Node* vNode, int sy, int sx)
-{
-	int x = sx;
-	int y = sy + 1;
-	while (1)
-	{
-		if (x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT)
-			break;
-		if (grid[y][x] == 1)
-			break;
 
-		// 코너 발견 또는 목적지 발견
-		bool bHasCorner = false;
-		bHasCorner |= (CheckObstacle(y, x + 1) && !CheckObstacle(y + 1, x + 1));
-		bHasCorner |= (CheckObstacle(y, x - 1) && !CheckObstacle(y + 1, x - 1));
-
-		bool isGoal = (y == endPos.first && x == endPos.second);
-		if (bHasCorner || isGoal)
-		{
-			// ----------- searchGrid 렌더링용 --------------
-			// - 해당 위치에 renderer의 searchGrid에 색상 등록
-			renderer->searchGrid[y][x] = colorMap[vNode];
-			return true;
-		}
-
-		// ----------- searchGrid 렌더링용 --------------
-		// - 해당 위치에 renderer의 searchGrid에 색상 등록
-		renderer->searchGrid[y][x] = colorMap[vNode];
-
-		y++;
-	}
-
-	return false;
-}
 
 bool CPathFinding::CheckObstacle(int y, int x)
 {

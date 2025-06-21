@@ -127,10 +127,7 @@ public:
 	
 	void SearchJumpPoint(Node* vNode, EDir searchDir);
 
-	bool HasCorner_R(Node* vNode, int sy, int sx);
-	bool HasCorner_U(Node* vNode, int sy, int sx);
-	bool HasCorner_L(Node* vNode, int sy, int sx);
-	bool HasCorner_D(Node* vNode, int sy, int sx);
+	bool HasCorner(Node* vNode, EDir searchDir, int sy, int sx);
 
 	bool CheckObstacle(int y, int x);
 
@@ -138,10 +135,6 @@ public:
 	bool IsWhiteColor(COLORREF c);
 	COLORREF GenerateUniqueColor();
 	COLORREF HSVtoRGB(double h, double s, double v);
-
-
-
-	
 
 public:
 
