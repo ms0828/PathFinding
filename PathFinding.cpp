@@ -1,4 +1,4 @@
-#include "PathFinding.h"
+ï»¿#include "PathFinding.h"
 #include <cmath>
 #include <cfloat>
 #include <random>
@@ -28,12 +28,12 @@ void CPathFinding::Init()
 	bFirstStep = true;
 	destNode = nullptr;
 
-	// searchNode ·»´õ¸µ °ü·Ã ÃÊ±âÈ­
+	// searchNode ë Œë”ë§ ê´€ë ¨ ì´ˆê¸°í™”
 	memset(renderer->searchGrid, RGB(0, 0, 0), sizeof(renderer->searchGrid));
 	colorMap.clear();
 	huePool.clear();
 
-	// - colorBrushMap¿¡ ÇÒ´çµÈ GDI ¿ÀºêÁ§Æ®(ºê·¯½Ã) delete
+	// - colorBrushMapì— í• ë‹¹ëœ GDI ì˜¤ë¸Œì íŠ¸(ë¸ŒëŸ¬ì‹œ) delete
 	for (const auto& entry : colorBrushMap)
 	{
 		if (entry.second == NULL || entry.second == INVALID_HANDLE_VALUE)
@@ -103,7 +103,7 @@ bool CPathFinding::FindPath_AStar_OneStep()
 	if (bHasGoal == false || destNode != nullptr)
 		return true;
 
-	// Ã¹ ½ÎÀÌÅ¬ ¿¹¿Ü Ã³¸®
+	// ì²« ì‹¸ì´í´ ì˜ˆì™¸ ì²˜ë¦¬
 	if (bFirstStep)
 	{
 		bFirstStep = false;
@@ -119,11 +119,11 @@ bool CPathFinding::FindPath_AStar_OneStep()
 	// AStar
 	if (!openList.empty())
 	{
-		// OpenList¿¡¼­ °¡Àå ºñ¿ëÀÌ ÀÛÀº ³ëµå¸¦ ÃßÃâ
+		// OpenListì—ì„œ ê°€ì¥ ë¹„ìš©ì´ ì‘ì€ ë…¸ë“œë¥¼ ì¶”ì¶œ
 		Node* vNode = FindMinNodeInOpenList();
 		openList.erase({ vNode->y, vNode->x });
 		
-		// ¸ñÀûÁö µµ´ŞÇß´Ù¸é °æ·Î ±¸¼º -> return
+		// ëª©ì ì§€ ë„ë‹¬í–ˆë‹¤ë©´ ê²½ë¡œ êµ¬ì„± -> return
 		if (vNode->y == endPos.first && vNode->x == endPos.second)
 		{
 			destNode = vNode;
@@ -132,10 +132,10 @@ bool CPathFinding::FindPath_AStar_OneStep()
 			return true;
 		}
 
-		// ¹æ¹® ·ÎÁ÷
+		// ë°©ë¬¸ ë¡œì§
 		closedList[{vNode->y, vNode->x}] = vNode;
 
-		// ´ÙÀ½ ¹æ¹® ³ëµå OpenList¿¡ µî·Ï
+		// ë‹¤ìŒ ë°©ë¬¸ ë…¸ë“œ OpenListì— ë“±ë¡
 		for (int i = 0; i < 8; i++)
 		{
 			int nx = vNode->x + dx[i];
@@ -143,25 +143,25 @@ bool CPathFinding::FindPath_AStar_OneStep()
 			if (nx < 0 || nx >= GRID_WIDTH || ny < 0 || ny >= GRID_HEIGHT)
 				continue;
 
-			// Àå¾Ö¹° Ã³¸®
+			// ì¥ì• ë¬¼ ì²˜ë¦¬
 			if (grid[ny][nx] == 1)
 				continue;
 
-			// + ´ë°¢¼± ¹æÇâÀÏ ¶§ Àå¾Ö¹° Ã³¸®
-			// - ºñ±ÇÀå (¿¬»ê ¿À¹öÇìµå)
-			// - »ç¿ëÀÚ°¡ Àå¾Ö¹°À» Á÷°¢ÇüÀ¸·Î ¸¸µå´Â°Ô ´õ ³´´Ù.
-			// - »ç¿ëÇÒ²¨¸é ÁÂÇ¥¿¡ ´ëÇÑ ¹öÆÛ ¿À¹ö·± ¿¹¿Ü Ãß°¡ÇØ¾ßÇÔ 
-			//if (i == 4 && grid[vNode->y - 1][vNode->x] && grid[vNode->y][vNode->x + 1]) //¢Ö
+			// + ëŒ€ê°ì„  ë°©í–¥ì¼ ë•Œ ì¥ì• ë¬¼ ì²˜ë¦¬
+			// - ë¹„ê¶Œì¥ (ì—°ì‚° ì˜¤ë²„í—¤ë“œ)
+			// - ì‚¬ìš©ìê°€ ì¥ì• ë¬¼ì„ ì§ê°í˜•ìœ¼ë¡œ ë§Œë“œëŠ”ê²Œ ë” ë‚«ë‹¤.
+			// - ì‚¬ìš©í• êº¼ë©´ ì¢Œí‘œì— ëŒ€í•œ ë²„í¼ ì˜¤ë²„ëŸ° ì˜ˆì™¸ ì¶”ê°€í•´ì•¼í•¨ 
+			//if (i == 4 && grid[vNode->y - 1][vNode->x] && grid[vNode->y][vNode->x + 1]) //â†—
 			//	continue;
-			//else if (i == 5 && grid[vNode->y][vNode->x + 1] && grid[vNode->y + 1][vNode->x]) //¢Ù
+			//else if (i == 5 && grid[vNode->y][vNode->x + 1] && grid[vNode->y + 1][vNode->x]) //â†˜
 			//	continue;
-			//else if (i == 6 && grid[vNode->y][vNode->x - 1] && grid[vNode->y + 1][vNode->x]) // ¢×
+			//else if (i == 6 && grid[vNode->y][vNode->x - 1] && grid[vNode->y + 1][vNode->x]) // â†™
 			//	continue;
-			//else if (i == 7 && grid[vNode->y][vNode->x - 1] && grid[vNode->y - 1][vNode->x]) //¢Ø
+			//else if (i == 7 && grid[vNode->y][vNode->x - 1] && grid[vNode->y - 1][vNode->x]) //â†–
 			//	continue;
 
 
-			// ´ÙÀ½ ¹æ¹®ÇÒ À§Ä¡ÀÇ F °ª °è»ê
+			// ë‹¤ìŒ ë°©ë¬¸í•  ìœ„ì¹˜ì˜ F ê°’ ê³„ì‚°
 			double g;
 			double h;
 			if (bDistanceG_Manhattan)
@@ -173,15 +173,15 @@ bool CPathFinding::FindPath_AStar_OneStep()
 			else
 				h = GetEuclideanDis({ ny, nx }, endPos);
 
-			// ÀÌ¹Ì ¹æ¹®ÇÑ ³ëµå´Â Å½»ö Á¦¿Ü
+			// ì´ë¯¸ ë°©ë¬¸í•œ ë…¸ë“œëŠ” íƒìƒ‰ ì œì™¸
 			if (closedList.find({ ny,nx }) != closedList.end())
 				continue;
 			
 			
-			// 1. ÇØ´ç À§Ä¡ÀÇ ³ëµå°¡ OpenList¿¡ Á¸ÀçÇÒ ¶§
-			//		- ´õ ÁÁÀº °æ·Î·Î ÇØ´ç À§Ä¡¸¦ ¹ß°ßÇß´Ù¸é °ªÀ» °»½ÅÇÑ´Ù.
-			// 2. ÇØ´ç À§Ä¡ÀÇ ³ëµå°¡ OpenList¿¡ ¾øÀ» ¶§
-			//		- »õ ³ëµå¸¦ »ı¼º ÈÄ, »õ·Î µî·ÏÇÑ´Ù.
+			// 1. í•´ë‹¹ ìœ„ì¹˜ì˜ ë…¸ë“œê°€ OpenListì— ì¡´ì¬í•  ë•Œ
+			//		- ë” ì¢‹ì€ ê²½ë¡œë¡œ í•´ë‹¹ ìœ„ì¹˜ë¥¼ ë°œê²¬í–ˆë‹¤ë©´ ê°’ì„ ê°±ì‹ í•œë‹¤.
+			// 2. í•´ë‹¹ ìœ„ì¹˜ì˜ ë…¸ë“œê°€ OpenListì— ì—†ì„ ë•Œ
+			//		- ìƒˆ ë…¸ë“œë¥¼ ìƒì„± í›„, ìƒˆë¡œ ë“±ë¡í•œë‹¤.
 			auto prev = openList.find({ ny,nx });
 			if (prev != openList.end())
 			{
@@ -194,7 +194,7 @@ bool CPathFinding::FindPath_AStar_OneStep()
 			}
 			else
 			{
-				// ÇØ´ç À§Ä¡¸¦ Ã³À½ ¹ß°ßÇß´Ù¸é ³ëµå »ı¼º ÈÄ OpenList¿¡ Ãß°¡
+				// í•´ë‹¹ ìœ„ì¹˜ë¥¼ ì²˜ìŒ ë°œê²¬í–ˆë‹¤ë©´ ë…¸ë“œ ìƒì„± í›„ OpenListì— ì¶”ê°€
 				Node* nextVNode = new Node(vNode, EDir::DEFAULT, { ny, nx }, g, h);
 				openList[{ny, nx}] = nextVNode;
 			}
@@ -223,7 +223,7 @@ bool CPathFinding::FindPath_JPS_OneStep()
 	if (bHasGoal == false || destNode != nullptr)
 		return true;
 
-	// Ã¹ ½ÎÀÌÅ¬ ¿¹¿Ü Ã³¸®
+	// ì²« ì‹¸ì´í´ ì˜ˆì™¸ ì²˜ë¦¬
 	if (bFirstStep)
 	{
 		bFirstStep = false;
@@ -235,9 +235,9 @@ bool CPathFinding::FindPath_JPS_OneStep()
 		Node* startNode = new Node(nullptr, DEFAULT, startPos, 0, h);
 		openList[startPos] = startNode;
 
-		//-------- searchGrid ·£´õ¸µ ¿ë ---------
-		// - colorMap¿¡ ÇØ´ç ³ëµå Æ÷ÀÎÅÍ¿¡ ´ëÇÑ color µî·Ï
-		// - ÇØ´ç color¿¡ ´ëÇÑ ºê·¯½Ã gdi ¿ÀºêÁ§Æ® µî·Ï
+		//-------- searchGrid ëœë”ë§ ìš© ---------
+		// - colorMapì— í•´ë‹¹ ë…¸ë“œ í¬ì¸í„°ì— ëŒ€í•œ color ë“±ë¡
+		// - í•´ë‹¹ colorì— ëŒ€í•œ ë¸ŒëŸ¬ì‹œ gdi ì˜¤ë¸Œì íŠ¸ ë“±ë¡
 		COLORREF color = GenerateUniqueColor();
 		colorMap[startNode] = color;
 		colorBrushMap.insert({ color, CreateSolidBrush(color)});
@@ -247,11 +247,11 @@ bool CPathFinding::FindPath_JPS_OneStep()
 
 	if (!openList.empty())
 	{
-		// OpenList¿¡¼­ °¡Àå ºñ¿ëÀÌ ÀÛÀº ³ëµå¸¦ ÃßÃâ
+		// OpenListì—ì„œ ê°€ì¥ ë¹„ìš©ì´ ì‘ì€ ë…¸ë“œë¥¼ ì¶”ì¶œ
 		Node* vNode = FindMinNodeInOpenList();
 		openList.erase({ vNode->y, vNode->x });
 
-		// ¸ñÀûÁö µµ´ŞÇß´Ù¸é °æ·Î ±¸¼º -> return
+		// ëª©ì ì§€ ë„ë‹¬í–ˆë‹¤ë©´ ê²½ë¡œ êµ¬ì„± -> return
 		if (vNode->y == endPos.first && vNode->x == endPos.second)
 		{
 			destNode = vNode;
@@ -260,109 +260,109 @@ bool CPathFinding::FindPath_JPS_OneStep()
 			return true;
 		}
 
-		// ¹æ¹® ·ÎÁ÷
+		// ë°©ë¬¸ ë¡œì§
 		closedList[{vNode->y, vNode->x}] = vNode;
 
-		// ÇöÀç ³ëµåÀÇ ¹æÇâÀ¸·ÎºÎÅÍ Æ¯Á¤ ¹æÇâÀ¸·Î »õ·Î »ı¼ºÇÒ ³ëµå¸¦ Å½»ö
+		// í˜„ì¬ ë…¸ë“œì˜ ë°©í–¥ìœ¼ë¡œë¶€í„° íŠ¹ì • ë°©í–¥ìœ¼ë¡œ ìƒˆë¡œ ìƒì„±í•  ë…¸ë“œë¥¼ íƒìƒ‰
 		EDir vNodeDir = vNode->dir;
 		switch (vNodeDir)
 		{
 		case EDir::DEFAULT:
-			SearchCorner_R(vNode);
-			SearchCorner_U(vNode);
-			SearchCorner_L(vNode);
-			SearchCorner_D(vNode);
-			SearchCorner_RU(vNode);
-			SearchCorner_RD(vNode);
-			SearchCorner_LD(vNode);
-			SearchCorner_LU(vNode);
+			SearchJumpPoint(vNode, EDir::R);
+			SearchJumpPoint(vNode, EDir::U);
+			SearchJumpPoint(vNode, EDir::L);
+			SearchJumpPoint(vNode, EDir::D);
+			SearchJumpPoint(vNode, EDir::RU);
+			SearchJumpPoint(vNode, EDir::RD);
+			SearchJumpPoint(vNode, EDir::LU);
+			SearchJumpPoint(vNode, EDir::LD);
 			break;
 		case EDir::R:
-			// ±âº» ¹æÇâ
-			SearchCorner_R(vNode);
-			// À§ÂÊ ÄÚ³Ê
+			// ê¸°ë³¸ ë°©í–¥
+			SearchJumpPoint(vNode, EDir::R);
+			// ìœ„ìª½ ì½”ë„ˆ
 			if (CheckObstacle(vNode->y - 1, vNode->x)) 
-				SearchCorner_RU(vNode);
-			// ¾Æ·¡ÂÊ ÄÚ³Ê
+				SearchJumpPoint(vNode, EDir::RU);
+			// ì•„ë˜ìª½ ì½”ë„ˆ
 			if (CheckObstacle(vNode->y + 1, vNode->x)) 
-				SearchCorner_RD(vNode);
+				SearchJumpPoint(vNode, EDir::RD);
 			break;
 		case EDir::U:
-			// ±âº» ¹æÇâ
-			SearchCorner_U(vNode);
-			// ¿À¸¥ÂÊ ÄÚ³Ê
+			// ê¸°ë³¸ ë°©í–¥
+			SearchJumpPoint(vNode, EDir::U);
+			// ì˜¤ë¥¸ìª½ ì½”ë„ˆ
 			if (CheckObstacle(vNode->y, vNode->x + 1))
-				SearchCorner_RU(vNode);
-			// ¿ŞÂÊ ÄÚ³Ê
+				SearchJumpPoint(vNode, EDir::RU);
+			// ì™¼ìª½ ì½”ë„ˆ
 			if (CheckObstacle(vNode->y, vNode->x - 1))
-				SearchCorner_LU(vNode);
+				SearchJumpPoint(vNode, EDir::LU);
 			break;
 		case EDir::L:
-			SearchCorner_L(vNode);
-			// À§ÂÊ ÄÚ³Ê
+			SearchJumpPoint(vNode, EDir::L);
+			// ìœ„ìª½ ì½”ë„ˆ
 			if (CheckObstacle(vNode->y - 1, vNode->x))
-				SearchCorner_LU(vNode);
-			// ¾Æ·¡ÂÊ ÄÚ³Ê
+				SearchJumpPoint(vNode, EDir::LU);
+			// ì•„ë˜ìª½ ì½”ë„ˆ
 			if (CheckObstacle(vNode->y + 1, vNode->x))
-				SearchCorner_LD(vNode);
+				SearchJumpPoint(vNode, EDir::LD);
 			break;
 		case EDir::D:
-			// ±âº» ¹æÇâ
-			SearchCorner_D(vNode);
-			// ¿À¸¥ÂÊ ÄÚ³Ê
+			// ê¸°ë³¸ ë°©í–¥
+			SearchJumpPoint(vNode, EDir::D);
+			// ì˜¤ë¥¸ìª½ ì½”ë„ˆ
 			if (CheckObstacle(vNode->y, vNode->x + 1))
-				SearchCorner_RD(vNode);
-			// ¿ŞÂÊ ÄÚ³Ê
+				SearchJumpPoint(vNode, EDir::RD);
+			// ì™¼ìª½ ì½”ë„ˆ
 			if (CheckObstacle(vNode->y, vNode->x - 1))
-				SearchCorner_LD(vNode);
+				SearchJumpPoint(vNode, EDir::LD);
 			break;
 		case EDir::RU:
-			// ±âº» ¹æÇâ
-			SearchCorner_RU(vNode);
-			SearchCorner_R(vNode);
-			SearchCorner_U(vNode);
-			// ¿ŞÂÊ À§ ÄÚ³Ê
+			// ê¸°ë³¸ ë°©í–¥
+			SearchJumpPoint(vNode, EDir::RU);
+			SearchJumpPoint(vNode, EDir::R);
+			SearchJumpPoint(vNode, EDir::U);
+			// ì™¼ìª½ ìœ„ ì½”ë„ˆ
 			if(CheckObstacle(vNode->y, vNode->x - 1))
-				SearchCorner_LU(vNode);
-			// ¿À¸¥ÂÊ ¾Æ·¡ ÄÚ³Ê
+				SearchJumpPoint(vNode, EDir::LU);
+			// ì˜¤ë¥¸ìª½ ì•„ë˜ ì½”ë„ˆ
 			if (CheckObstacle(vNode->y + 1, vNode->x))
-				SearchCorner_RD(vNode);
+				SearchJumpPoint(vNode, EDir::RD);
 			break;
 		case EDir::RD:
-			// ±âº» ¹æÇâ
-			SearchCorner_RD(vNode);
-			SearchCorner_R(vNode);
-			SearchCorner_D(vNode);
-			// ¿À¸¥ÂÊ À§ ÄÚ³Ê
+			// ê¸°ë³¸ ë°©í–¥
+			SearchJumpPoint(vNode, EDir::RD);
+			SearchJumpPoint(vNode, EDir::R);
+			SearchJumpPoint(vNode, EDir::D);
+			// ì˜¤ë¥¸ìª½ ìœ„ ì½”ë„ˆ
 			if (CheckObstacle(vNode->y - 1, vNode->x))
-				SearchCorner_RU(vNode);
-			// ¿ŞÂÊ ¾Æ·¡ ÄÚ³Ê
+				SearchJumpPoint(vNode, EDir::RU);
+			// ì™¼ìª½ ì•„ë˜ ì½”ë„ˆ
 			if (CheckObstacle(vNode->y, vNode->x - 1))
-				SearchCorner_LD(vNode);
+				SearchJumpPoint(vNode, EDir::LD);
 			break;
 		case EDir::LD:
-			// ±âº» ¹æÇâ
-			SearchCorner_LD(vNode);
-			SearchCorner_L(vNode);
-			SearchCorner_D(vNode);
-			// ¿ŞÂÊ À§ ÄÚ³Ê
+			// ê¸°ë³¸ ë°©í–¥
+			SearchJumpPoint(vNode, EDir::LD);
+			SearchJumpPoint(vNode, EDir::L);
+			SearchJumpPoint(vNode, EDir::D);
+			// ì™¼ìª½ ìœ„ ì½”ë„ˆ
 			if (CheckObstacle(vNode->y - 1, vNode->x))
-				SearchCorner_LU(vNode);
-			// ¿À¸¥ÂÊ ¾Æ·¡ ÄÚ³Ê
+				SearchJumpPoint(vNode, EDir::LU);
+			// ì˜¤ë¥¸ìª½ ì•„ë˜ ì½”ë„ˆ
 			if (CheckObstacle(vNode->y, vNode->x + 1))
-				SearchCorner_RD(vNode);
+				SearchJumpPoint(vNode, EDir::RD);
 			break;
 		case EDir::LU:
-			// ±âº» ¹æÇâ
-			SearchCorner_LU(vNode);
-			SearchCorner_L(vNode);
-			SearchCorner_U(vNode);
-			// ¿À¸¥ÂÊ À§ ÄÚ³Ê
+			// ê¸°ë³¸ ë°©í–¥
+			SearchJumpPoint(vNode, EDir::LU);
+			SearchJumpPoint(vNode, EDir::L);
+			SearchJumpPoint(vNode, EDir::U);
+			// ì˜¤ë¥¸ìª½ ìœ„ ì½”ë„ˆ
 			if (CheckObstacle(vNode->y, vNode->x + 1))
-				SearchCorner_RU(vNode);
-			// ¿ŞÂÊ ¾Æ·¡ ÄÚ³Ê
+				SearchJumpPoint(vNode, EDir::RU);
+			// ì™¼ìª½ ì•„ë˜ ì½”ë„ˆ
 			if (CheckObstacle(vNode->y + 1, vNode->x))
-				SearchCorner_LD(vNode);
+				SearchJumpPoint(vNode, EDir::LD);
 			break;
 		}
 		
@@ -375,12 +375,21 @@ bool CPathFinding::FindPath_JPS_OneStep()
 	return false;
 }
 
-void CPathFinding::SearchCorner_R(Node* vNode)
+void CPathFinding::SearchJumpPoint(Node* vNode, EDir searchDir)
 {
-	int y = vNode->y;
-	int x = vNode->x + 1;
-	double g;
-	double h;
+	int y, x;
+	switch (searchDir)
+	{
+	case EDir::R:	y = vNode->y;	x = vNode->x + 1;	break;
+	case EDir::U:	y = vNode->y - 1;	x = vNode->x;	break;
+	case EDir::L:	y = vNode->y;	x = vNode->x - 1;	break;
+	case EDir::D:	y = vNode->y + 1;	x = vNode->x;	break;
+	case EDir::RU:	y = vNode->y - 1;	x = vNode->x + 1;	break;
+	case EDir::RD:	y = vNode->y + 1;	x = vNode->x + 1;	break;
+	case EDir::LD:	y = vNode->y + 1;	x = vNode->x - 1;	break;
+	case EDir::LU:	y = vNode->y - 1;	x = vNode->x - 1;	break;
+	}
+	
 	
 	while (1)
 	{
@@ -389,85 +398,56 @@ void CPathFinding::SearchCorner_R(Node* vNode)
 		if (grid[y][x] == 1)
 			break;
 
-		// ÄÚ³Ê ¹ß°ß ¶Ç´Â ¸ñÀûÁö ¹ß°ß
+		// ì½”ë„ˆ ë°œê²¬ ë˜ëŠ” ëª©ì ì§€ ë°œê²¬ í™•ì¸ ë¡œì§
 		bool isJumpPoint = false;
-		isJumpPoint |= (CheckObstacle(y + 1, x) && !CheckObstacle(y + 1, x + 1));
-		isJumpPoint |= (CheckObstacle(y - 1, x) && !CheckObstacle(y - 1, x + 1));
-
-		if (isJumpPoint || (y == endPos.first && x == endPos.second))
+		switch (searchDir)
 		{
-			if (bDistanceG_Manhattan)
-				g = vNode->g + GetManhattanDis({ vNode->y, vNode->x }, {y, x});
-			else
-				g = vNode->g + GetEuclideanDis({ vNode->y, vNode->x }, { y, x });
-			if (bDistanceH_Manhattan)
-				h = GetManhattanDis({ y, x }, endPos);
-			else
-				h = GetEuclideanDis({ y, x }, endPos);
-
-
-			// ÀÌ¹Ì ¹æ¹®ÇÑ ³ëµå´Â Å½»ö Á¦¿Ü (ÃÖ´Ü °æ·ÎÀÓÀ» º¸Àå)
-			if (closedList.find({ y,x }) != closedList.end())
-				break;
-
-			// 1. ÇØ´ç À§Ä¡ÀÇ ³ëµå°¡ OpenList¿¡ Á¸ÀçÇÒ ¶§
-			//		- ´õ ÁÁÀº °æ·Î·Î ÇØ´ç À§Ä¡¸¦ ¹ß°ßÇß´Ù¸é °ªÀ» °»½ÅÇÑ´Ù.
-			// 2. ÇØ´ç À§Ä¡ÀÇ ³ëµå°¡ OpenList¿¡ ¾øÀ» ¶§
-			//		- »õ ³ëµå¸¦ »ı¼º ÈÄ, »õ·Î µî·ÏÇÑ´Ù.
-			auto prev = openList.find({ y,x });
-			if (prev != openList.end())
-			{
-				Node* prevNode = (*prev).second;
-				if (g + h >= prevNode->f)
-					break;
-				prevNode->g = g;
-				prevNode->f = g + h;
-				prevNode->parent = vNode;
-				prevNode->dir = EDir::R;
-			}
-			else
-			{
-				// ÇØ´ç À§Ä¡¸¦ Ã³À½ ¹ß°ßÇß´Ù¸é ³ëµå »ı¼º ÈÄ OpenList¿¡ Ãß°¡
-				Node* nextVNode = new Node(vNode, EDir::R, { y, x }, g, h);
-				openList[{y, x}] = nextVNode;
-
-				// ----------- searchGrid ·»´õ¸µ¿ë --------------
-				// - colorMap¿¡ ÇØ´ç ³ëµå Æ÷ÀÎÅÍ¿¡ ´ëÇÑ color µî·Ï
-				// - ÇØ´ç color¿¡ ´ëÇÑ ºê·¯½Ã gdi ¿ÀºêÁ§Æ® µî·Ï
-				COLORREF color = GenerateUniqueColor();
-				colorMap[nextVNode] = color;
-				colorBrushMap.insert({ color, CreateSolidBrush(color) });
-			}
+		case EDir::R:
+			isJumpPoint |= (CheckObstacle(y + 1, x) && !CheckObstacle(y + 1, x + 1));
+			isJumpPoint |= (CheckObstacle(y - 1, x) && !CheckObstacle(y - 1, x + 1));
+			break;
+		case EDir::L:
+			isJumpPoint |= (CheckObstacle(y + 1, x) && !CheckObstacle(y + 1, x - 1));
+			isJumpPoint |= (CheckObstacle(y - 1, x) && !CheckObstacle(y - 1, x - 1));
+			break;
+		case EDir::U:
+			isJumpPoint |= (CheckObstacle(y, x + 1) && !CheckObstacle(y - 1, x + 1));
+			isJumpPoint |= (CheckObstacle(y, x - 1) && !CheckObstacle(y - 1, x - 1));
+			break;
+		case EDir::D:
+			isJumpPoint |= (CheckObstacle(y, x + 1) && !CheckObstacle(y + 1, x + 1));
+			isJumpPoint |= (CheckObstacle(y, x - 1) && !CheckObstacle(y + 1, x - 1));
+			break;
+		case EDir::RU:
+			isJumpPoint |= (CheckObstacle(y, x - 1) && !CheckObstacle(y - 1, x - 1));
+			isJumpPoint |= (CheckObstacle(y + 1, x) && !CheckObstacle(y + 1, x + 1));
+			isJumpPoint |= HasCorner_R(vNode, y, x);
+			isJumpPoint |= HasCorner_U(vNode, y, x);
+			break;
+		case EDir::RD:
+			isJumpPoint |= (CheckObstacle(y, x - 1) && !CheckObstacle(y + 1, x - 1));
+			isJumpPoint |= (CheckObstacle(y - 1, x) && !CheckObstacle(y - 1, x + 1));
+			isJumpPoint |= HasCorner_R(vNode, y, x);
+			isJumpPoint |= HasCorner_D(vNode, y, x);
+			break;
+		case EDir::LU:
+			isJumpPoint |= (CheckObstacle(y, x + 1) && !CheckObstacle(y - 1, x + 1));
+			isJumpPoint |= (CheckObstacle(y + 1, x) && !CheckObstacle(y + 1, x - 1));
+			isJumpPoint |= HasCorner_L(vNode, y, x);
+			isJumpPoint |= HasCorner_U(vNode, y, x);
+			break;
+		case EDir::LD:
+			isJumpPoint |= (CheckObstacle(y, x + 1) && !CheckObstacle(y + 1, x + 1));
+			isJumpPoint |= (CheckObstacle(y - 1, x) && !CheckObstacle(y - 1, x - 1));
+			isJumpPoint |= HasCorner_L(vNode, y, x);
+			isJumpPoint |= HasCorner_D(vNode, y, x);
 			break;
 		}
+		
 
-		// ----------- searchGrid ·»´õ¸µ¿ë --------------
-		// - ÇØ´ç À§Ä¡¿¡ rendererÀÇ searchGrid¿¡ »ö»ó µî·Ï
-		renderer->searchGrid[y][x] = colorMap[vNode];
-
-		x++;
-	}
-}
-
-void CPathFinding::SearchCorner_L(Node* vNode)
-{
-	int y = vNode->y;
-	int x = vNode->x - 1;
-	double g;
-	double h;
-
-	while (1)
-	{
-		if (x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT)
-			break;
-		if (grid[y][x] == 1)
-			break;
-
-		// ÄÚ³Ê ¹ß°ß ¶Ç´Â ¸ñÀûÁö ¹ß°ß
-		bool isJumpPoint = false;
-		isJumpPoint |= (CheckObstacle(y + 1, x) && !CheckObstacle(y + 1, x - 1));
-		isJumpPoint |= (CheckObstacle(y - 1, x) && !CheckObstacle(y - 1, x - 1));
-
+		// ì í”„ í¬ì¸íŠ¸ë¥¼ ì°¾ì•˜ì„ ë•Œ ì í”„ í¬ì¸íŠ¸ ê°±ì‹  or ìƒì„± í›„ OpenList ì¶”ê°€
+		double g;
+		double h;
 		if (isJumpPoint || (y == endPos.first && x == endPos.second))
 		{
 			if (bDistanceG_Manhattan)
@@ -480,14 +460,15 @@ void CPathFinding::SearchCorner_L(Node* vNode)
 				h = GetEuclideanDis({ y, x }, endPos);
 
 
-			// ÀÌ¹Ì ¹æ¹®ÇÑ ³ëµå´Â Å½»ö Á¦¿Ü (ÃÖ´Ü °æ·ÎÀÓÀ» º¸Àå)
+			// ì´ë¯¸ ë°©ë¬¸í•œ ë…¸ë“œëŠ” íƒìƒ‰ ì œì™¸ (ìµœë‹¨ ê²½ë¡œì„ì„ ë³´ì¥)
 			if (closedList.find({ y,x }) != closedList.end())
 				break;
 
-			// 1. ÇØ´ç À§Ä¡ÀÇ ³ëµå°¡ OpenList¿¡ Á¸ÀçÇÒ ¶§
-			//		- ´õ ÁÁÀº °æ·Î·Î ÇØ´ç À§Ä¡¸¦ ¹ß°ßÇß´Ù¸é °ªÀ» °»½ÅÇÑ´Ù.
-			// 2. ÇØ´ç À§Ä¡ÀÇ ³ëµå°¡ OpenList¿¡ ¾øÀ» ¶§
-			//		- »õ ³ëµå¸¦ »ı¼º ÈÄ, »õ·Î µî·ÏÇÑ´Ù.
+
+			// 1. í•´ë‹¹ ìœ„ì¹˜ì˜ ë…¸ë“œê°€ OpenListì— ì¡´ì¬í•  ë•Œ
+			//		- ë” ì¢‹ì€ ê²½ë¡œë¡œ í•´ë‹¹ ìœ„ì¹˜ë¥¼ ë°œê²¬í–ˆë‹¤ë©´ ê°’ì„ ê°±ì‹ í•œë‹¤.
+			// 2. í•´ë‹¹ ìœ„ì¹˜ì˜ ë…¸ë“œê°€ OpenListì— ì—†ì„ ë•Œ
+			//		- ìƒˆ ë…¸ë“œë¥¼ ìƒì„± í›„, ìƒˆë¡œ ë“±ë¡í•œë‹¤.
 			auto prev = openList.find({ y,x });
 			if (prev != openList.end())
 			{
@@ -497,17 +478,17 @@ void CPathFinding::SearchCorner_L(Node* vNode)
 				prevNode->g = g;
 				prevNode->f = g + h;
 				prevNode->parent = vNode;
-				prevNode->dir = EDir::L;
+				prevNode->dir = searchDir;
 			}
 			else
 			{
-				// ÇØ´ç À§Ä¡¸¦ Ã³À½ ¹ß°ßÇß´Ù¸é ³ëµå »ı¼º ÈÄ OpenList¿¡ Ãß°¡
-				Node* nextVNode = new Node(vNode, EDir::L, { y, x }, g, h);
+				// í•´ë‹¹ ìœ„ì¹˜ë¥¼ ì²˜ìŒ ë°œê²¬í–ˆë‹¤ë©´ ë…¸ë“œ ìƒì„± í›„ OpenListì— ì¶”ê°€
+				Node* nextVNode = new Node(vNode, searchDir, { y, x }, g, h);
 				openList[{y, x}] = nextVNode;
 
-				// ----------- searchGrid ·»´õ¸µ¿ë --------------
-				// - colorMap¿¡ ÇØ´ç ³ëµå Æ÷ÀÎÅÍ¿¡ ´ëÇÑ color µî·Ï
-				// - ÇØ´ç color¿¡ ´ëÇÑ ºê·¯½Ã gdi ¿ÀºêÁ§Æ® µî·Ï
+				// ----------- searchGrid ë Œë”ë§ìš© --------------
+				// - colorMapì— í•´ë‹¹ ë…¸ë“œ í¬ì¸í„°ì— ëŒ€í•œ color ë“±ë¡
+				// - í•´ë‹¹ colorì— ëŒ€í•œ ë¸ŒëŸ¬ì‹œ gdi ì˜¤ë¸Œì íŠ¸ ë“±ë¡
 				COLORREF color = GenerateUniqueColor();
 				colorMap[nextVNode] = color;
 				colorBrushMap.insert({ color, CreateSolidBrush(color) });
@@ -515,471 +496,23 @@ void CPathFinding::SearchCorner_L(Node* vNode)
 			break;
 		}
 
-		// ----------- searchGrid ·»´õ¸µ¿ë --------------
-		// - ÇØ´ç À§Ä¡¿¡ rendererÀÇ searchGrid¿¡ »ö»ó µî·Ï
+		// ----------- searchGrid ë Œë”ë§ìš© --------------
+		// - í•´ë‹¹ ìœ„ì¹˜ì— rendererì˜ searchGridì— ìƒ‰ìƒ ë“±ë¡
 		renderer->searchGrid[y][x] = colorMap[vNode];
 
-		x--;
-	}
-}
 
-void CPathFinding::SearchCorner_U(Node* vNode)
-{
-	int y = vNode->y - 1;
-	int x = vNode->x;
-	double g;
-	double h;
-
-	while (1)
-	{
-		if (x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT)
-			break;
-		if (grid[y][x] == 1)
-			break;
-
-		// ÄÚ³Ê ¹ß°ß ¶Ç´Â ¸ñÀûÁö ¹ß°ß
-		bool isJumpPoint = false;
-		isJumpPoint |= (CheckObstacle(y, x + 1) && !CheckObstacle(y - 1, x + 1));
-		isJumpPoint |= (CheckObstacle(y, x - 1) && !CheckObstacle(y - 1, x - 1));
-
-		if (isJumpPoint || (y == endPos.first && x == endPos.second))
+		// ë‹¤ìŒ íƒìƒ‰ ì¢Œí‘œ ì—…ë°ì´íŠ¸
+		switch (searchDir)
 		{
-			if (bDistanceG_Manhattan)
-				g = vNode->g + GetManhattanDis({ vNode->y, vNode->x }, { y, x });
-			else
-				g = vNode->g + GetEuclideanDis({ vNode->y, vNode->x }, { y, x });
-			if (bDistanceH_Manhattan)
-				h = GetManhattanDis({ y, x }, endPos);
-			else
-				h = GetEuclideanDis({ y, x }, endPos);
-
-
-			// ÀÌ¹Ì ¹æ¹®ÇÑ ³ëµå´Â Å½»ö Á¦¿Ü (ÃÖ´Ü °æ·ÎÀÓÀ» º¸Àå)
-			if (closedList.find({ y,x }) != closedList.end())
-				break;
-
-			// 1. ÇØ´ç À§Ä¡ÀÇ ³ëµå°¡ OpenList¿¡ Á¸ÀçÇÒ ¶§
-			//		- ´õ ÁÁÀº °æ·Î·Î ÇØ´ç À§Ä¡¸¦ ¹ß°ßÇß´Ù¸é °ªÀ» °»½ÅÇÑ´Ù.
-			// 2. ÇØ´ç À§Ä¡ÀÇ ³ëµå°¡ OpenList¿¡ ¾øÀ» ¶§
-			//		- »õ ³ëµå¸¦ »ı¼º ÈÄ, »õ·Î µî·ÏÇÑ´Ù.
-			auto prev = openList.find({ y,x });
-			if (prev != openList.end())
-			{
-				Node* prevNode = (*prev).second;
-				if (g + h >= prevNode->f)
-					break;
-				prevNode->g = g;
-				prevNode->f = g + h;
-				prevNode->parent = vNode;
-				prevNode->dir = EDir::U;
-			}
-			else
-			{
-				// ÇØ´ç À§Ä¡¸¦ Ã³À½ ¹ß°ßÇß´Ù¸é ³ëµå »ı¼º ÈÄ OpenList¿¡ Ãß°¡
-				Node* nextVNode = new Node(vNode, EDir::U, { y, x }, g, h);
-				openList[{y, x}] = nextVNode;
-
-				// ----------- searchGrid ·»´õ¸µ¿ë --------------
-				// - colorMap¿¡ ÇØ´ç ³ëµå Æ÷ÀÎÅÍ¿¡ ´ëÇÑ color µî·Ï
-				// - ÇØ´ç color¿¡ ´ëÇÑ ºê·¯½Ã gdi ¿ÀºêÁ§Æ® µî·Ï
-				COLORREF color = GenerateUniqueColor();
-				colorMap[nextVNode] = color;
-				colorBrushMap.insert({ color, CreateSolidBrush(color) });
-			}
-			break;
+		case EDir::R:	x++;	break;
+		case EDir::U:	y--;	break;
+		case EDir::L:	x--;	break;
+		case EDir::D:	y++;	break;
+		case EDir::RU:	x++;	y--;	break;
+		case EDir::RD:	x++;	y++;	break;
+		case EDir::LD:	x--;	y++;	break;
+		case EDir::LU:	x--;	y--;	break;
 		}
-
-		// ----------- searchGrid ·»´õ¸µ¿ë --------------
-		// - ÇØ´ç À§Ä¡¿¡ rendererÀÇ searchGrid¿¡ »ö»ó µî·Ï
-		renderer->searchGrid[y][x] = colorMap[vNode];
-
-		y--;
-	}
-}
-
-void CPathFinding::SearchCorner_D(Node* vNode)
-{
-	int y = vNode->y + 1;
-	int x = vNode->x;
-	double g;
-	double h;
-
-	while (1)
-	{
-		if (x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT)
-			break;
-		if (grid[y][x] == 1)
-			break;
-
-		// ÄÚ³Ê ¹ß°ß ¶Ç´Â ¸ñÀûÁö ¹ß°ß
-		bool isJumpPoint = false;
-		isJumpPoint |= (CheckObstacle(y, x + 1) && !CheckObstacle(y + 1, x + 1));
-		isJumpPoint |= (CheckObstacle(y, x - 1) && !CheckObstacle(y + 1, x - 1));
-
-		if (isJumpPoint || (y == endPos.first && x == endPos.second))
-		{
-			if (bDistanceG_Manhattan)
-				g = vNode->g + GetManhattanDis({ vNode->y, vNode->x }, { y, x });
-			else
-				g = vNode->g + GetEuclideanDis({ vNode->y, vNode->x }, { y, x });
-			if (bDistanceH_Manhattan)
-				h = GetManhattanDis({ y, x }, endPos);
-			else
-				h = GetEuclideanDis({ y, x }, endPos);
-
-
-			// ÀÌ¹Ì ¹æ¹®ÇÑ ³ëµå´Â Å½»ö Á¦¿Ü (ÃÖ´Ü °æ·ÎÀÓÀ» º¸Àå)
-			if (closedList.find({ y,x }) != closedList.end())
-				break;
-
-			// 1. ÇØ´ç À§Ä¡ÀÇ ³ëµå°¡ OpenList¿¡ Á¸ÀçÇÒ ¶§
-			//		- ´õ ÁÁÀº °æ·Î·Î ÇØ´ç À§Ä¡¸¦ ¹ß°ßÇß´Ù¸é °ªÀ» °»½ÅÇÑ´Ù.
-			// 2. ÇØ´ç À§Ä¡ÀÇ ³ëµå°¡ OpenList¿¡ ¾øÀ» ¶§
-			//		- »õ ³ëµå¸¦ »ı¼º ÈÄ, »õ·Î µî·ÏÇÑ´Ù.
-			auto prev = openList.find({ y,x });
-			if (prev != openList.end())
-			{
-				Node* prevNode = (*prev).second;
-				if (g + h >= prevNode->f)
-					break;
-				prevNode->g = g;
-				prevNode->f = g + h;
-				prevNode->parent = vNode;
-				prevNode->dir = EDir::D;
-			}
-			else
-			{
-				// ÇØ´ç À§Ä¡¸¦ Ã³À½ ¹ß°ßÇß´Ù¸é ³ëµå »ı¼º ÈÄ OpenList¿¡ Ãß°¡
-				Node* nextVNode = new Node(vNode, EDir::D, { y, x }, g, h);
-				openList[{y, x}] = nextVNode;
-
-				// ----------- searchGrid ·»´õ¸µ¿ë --------------
-				// - colorMap¿¡ ÇØ´ç ³ëµå Æ÷ÀÎÅÍ¿¡ ´ëÇÑ color µî·Ï
-				// - ÇØ´ç color¿¡ ´ëÇÑ ºê·¯½Ã gdi ¿ÀºêÁ§Æ® µî·Ï
-				COLORREF color = GenerateUniqueColor();
-				colorMap[nextVNode] = color;
-				colorBrushMap.insert({ color, CreateSolidBrush(color) });
-			}
-			break;
-		}
-
-		// ----------- searchGrid ·»´õ¸µ¿ë --------------
-		// - ÇØ´ç À§Ä¡¿¡ rendererÀÇ searchGrid¿¡ »ö»ó µî·Ï
-		renderer->searchGrid[y][x] = colorMap[vNode];
-
-		y++;
-	}
-}
-
-
-void CPathFinding::SearchCorner_RU(Node* vNode)
-{
-	int y = vNode->y - 1;
-	int x = vNode->x + 1;
-	double g;
-	double h;
-
-	while (1)
-	{
-		if (x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT)
-			break;
-		if (grid[y][x] == 1)
-			break;
-		// ÄÚ³Ê ¹ß°ß ¶Ç´Â ¸ñÀûÁö ¹ß°ß
-		bool isJumpPoint = false;
-		isJumpPoint |= (CheckObstacle(y, x - 1) && !CheckObstacle(y - 1, x - 1));
-		isJumpPoint |= (CheckObstacle(y + 1, x) && !CheckObstacle(y + 1, x + 1));
-
-		// ¼öÆò ¼öÁ÷ °Å¸®¿¡ ÄÚ³Ê È¤Àº ¸ñÀûÁö ¹ß°ß
-		isJumpPoint |= HasCorner_R(vNode, y, x);
-		isJumpPoint |= HasCorner_U(vNode, y, x);
-
-		if (isJumpPoint || (y == endPos.first && x == endPos.second))
-		{
-			if (bDistanceG_Manhattan)
-				g = vNode->g + GetManhattanDis({ vNode->y, vNode->x }, { y, x });
-			else
-				g = vNode->g + GetEuclideanDis({ vNode->y, vNode->x }, { y, x });
-			if (bDistanceH_Manhattan)
-				h = GetManhattanDis({ y, x }, endPos);
-			else
-				h = GetEuclideanDis({ y, x }, endPos);
-
-
-			// ÀÌ¹Ì ¹æ¹®ÇÑ ³ëµå´Â Å½»ö Á¦¿Ü (ÃÖ´Ü °æ·ÎÀÓÀ» º¸Àå)
-			if (closedList.find({ y,x }) != closedList.end())
-				break;
-
-			// 1. ÇØ´ç À§Ä¡ÀÇ ³ëµå°¡ OpenList¿¡ Á¸ÀçÇÒ ¶§
-			//		- ´õ ÁÁÀº °æ·Î·Î ÇØ´ç À§Ä¡¸¦ ¹ß°ßÇß´Ù¸é °ªÀ» °»½ÅÇÑ´Ù.
-			// 2. ÇØ´ç À§Ä¡ÀÇ ³ëµå°¡ OpenList¿¡ ¾øÀ» ¶§
-			//		- »õ ³ëµå¸¦ »ı¼º ÈÄ, »õ·Î µî·ÏÇÑ´Ù.
-			auto prev = openList.find({ y,x });
-			if (prev != openList.end())
-			{
-				Node* prevNode = (*prev).second;
-				if (g + h >= prevNode->f)
-					break;
-				prevNode->g = g;
-				prevNode->f = g + h;
-				prevNode->parent = vNode;
-				prevNode->dir = EDir::RU;
-			}
-			else
-			{
-				// ÇØ´ç À§Ä¡¸¦ Ã³À½ ¹ß°ßÇß´Ù¸é ³ëµå »ı¼º ÈÄ OpenList¿¡ Ãß°¡
-				Node* nextVNode = new Node(vNode, EDir::RU, { y, x }, g, h);
-				openList[{y, x}] = nextVNode;
-
-				// ----------- searchGrid ·»´õ¸µ¿ë --------------
-				// - colorMap¿¡ ÇØ´ç ³ëµå Æ÷ÀÎÅÍ¿¡ ´ëÇÑ color µî·Ï
-				// - ÇØ´ç color¿¡ ´ëÇÑ ºê·¯½Ã gdi ¿ÀºêÁ§Æ® µî·Ï
-				COLORREF color = GenerateUniqueColor();
-				colorMap[nextVNode] = color;
-				colorBrushMap.insert({ color, CreateSolidBrush(color) });
-			}
-			break;
-		}
-
-		// ----------- searchGrid ·»´õ¸µ¿ë --------------
-		// - ÇØ´ç À§Ä¡¿¡ rendererÀÇ searchGrid¿¡ »ö»ó µî·Ï
-		renderer->searchGrid[y][x] = colorMap[vNode];
-		y--;
-		x++;
-	}
-}
-
-
-void CPathFinding::SearchCorner_RD(Node* vNode)
-{
-	int y = vNode->y + 1;
-	int x = vNode->x + 1;
-	double g;
-	double h;
-
-	while (1)
-	{
-		if (x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT)
-			break;
-		if (grid[y][x] == 1)
-			break;
-		// ÄÚ³Ê ¹ß°ß ¶Ç´Â ¸ñÀûÁö ¹ß°ß
-		bool isJumpPoint = false;
-		isJumpPoint |= (CheckObstacle(y, x - 1) && !CheckObstacle(y + 1, x - 1));
-		isJumpPoint |= (CheckObstacle(y - 1, x) && !CheckObstacle(y - 1, x + 1));
-
-		// ¼öÆò ¼öÁ÷ °Å¸®¿¡ ÄÚ³Ê È¤Àº ¸ñÀûÁö ¹ß°ß
-		isJumpPoint |= HasCorner_R(vNode, y, x);
-		isJumpPoint |= HasCorner_D(vNode, y, x);
-
-		if (isJumpPoint || (y == endPos.first && x == endPos.second))
-		{
-			if (bDistanceG_Manhattan)
-				g = vNode->g + GetManhattanDis({ vNode->y, vNode->x }, { y, x });
-			else
-				g = vNode->g + GetEuclideanDis({ vNode->y, vNode->x }, { y, x });
-			if (bDistanceH_Manhattan)
-				h = GetManhattanDis({ y, x }, endPos);
-			else
-				h = GetEuclideanDis({ y, x }, endPos);
-
-
-			// ÀÌ¹Ì ¹æ¹®ÇÑ ³ëµå´Â Å½»ö Á¦¿Ü (ÃÖ´Ü °æ·ÎÀÓÀ» º¸Àå)
-			if (closedList.find({ y,x }) != closedList.end())
-				break;
-
-			// 1. ÇØ´ç À§Ä¡ÀÇ ³ëµå°¡ OpenList¿¡ Á¸ÀçÇÒ ¶§
-			//		- ´õ ÁÁÀº °æ·Î·Î ÇØ´ç À§Ä¡¸¦ ¹ß°ßÇß´Ù¸é °ªÀ» °»½ÅÇÑ´Ù.
-			// 2. ÇØ´ç À§Ä¡ÀÇ ³ëµå°¡ OpenList¿¡ ¾øÀ» ¶§
-			//		- »õ ³ëµå¸¦ »ı¼º ÈÄ, »õ·Î µî·ÏÇÑ´Ù.
-			auto prev = openList.find({ y,x });
-			if (prev != openList.end())
-			{
-				Node* prevNode = (*prev).second;
-				if (g + h >= prevNode->f)
-					break;
-				prevNode->g = g;
-				prevNode->f = g + h;
-				prevNode->parent = vNode;
-				prevNode->dir = EDir::RD;
-			}
-			else
-			{
-				// ÇØ´ç À§Ä¡¸¦ Ã³À½ ¹ß°ßÇß´Ù¸é ³ëµå »ı¼º ÈÄ OpenList¿¡ Ãß°¡
-				Node* nextVNode = new Node(vNode, EDir::RD, { y, x }, g, h);
-				openList[{y, x}] = nextVNode;
-
-				// ----------- searchGrid ·»´õ¸µ¿ë --------------
-				// - colorMap¿¡ ÇØ´ç ³ëµå Æ÷ÀÎÅÍ¿¡ ´ëÇÑ color µî·Ï
-				// - ÇØ´ç color¿¡ ´ëÇÑ ºê·¯½Ã gdi ¿ÀºêÁ§Æ® µî·Ï
-				COLORREF color = GenerateUniqueColor();
-				colorMap[nextVNode] = color;
-				colorBrushMap.insert({ color, CreateSolidBrush(color) });
-			}
-			break;
-		}
-
-		// ----------- searchGrid ·»´õ¸µ¿ë --------------
-		// - ÇØ´ç À§Ä¡¿¡ rendererÀÇ searchGrid¿¡ »ö»ó µî·Ï
-		renderer->searchGrid[y][x] = colorMap[vNode];
-		y++;
-		x++;
-	}
-}
-
-
-void CPathFinding::SearchCorner_LU(Node* vNode)
-{
-	int y = vNode->y - 1;
-	int x = vNode->x - 1;
-	double g;
-	double h;
-
-	while (1)
-	{
-		if (x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT)
-			break;
-		if (grid[y][x] == 1)
-			break;
-		// ÄÚ³Ê ¹ß°ß ¶Ç´Â ¸ñÀûÁö ¹ß°ß
-		bool isJumpPoint = false;
-		isJumpPoint |= (CheckObstacle(y, x + 1) && !CheckObstacle(y - 1, x + 1));
-		isJumpPoint |= (CheckObstacle(y + 1, x) && !CheckObstacle(y + 1, x - 1));
-
-		// ¼öÆò ¼öÁ÷ °Å¸®¿¡ ÄÚ³Ê È¤Àº ¸ñÀûÁö ¹ß°ß
-		isJumpPoint |= HasCorner_L(vNode, y, x);
-		isJumpPoint |= HasCorner_U(vNode, y, x);
-
-		if (isJumpPoint || (y == endPos.first && x == endPos.second))
-		{
-			if (bDistanceG_Manhattan)
-				g = vNode->g + GetManhattanDis({ vNode->y, vNode->x }, { y, x });
-			else
-				g = vNode->g + GetEuclideanDis({ vNode->y, vNode->x }, { y, x });
-			if (bDistanceH_Manhattan)
-				h = GetManhattanDis({ y, x }, endPos);
-			else
-				h = GetEuclideanDis({ y, x }, endPos);
-
-
-			// ÀÌ¹Ì ¹æ¹®ÇÑ ³ëµå´Â Å½»ö Á¦¿Ü (ÃÖ´Ü °æ·ÎÀÓÀ» º¸Àå)
-			if (closedList.find({ y,x }) != closedList.end())
-				break;
-
-			// 1. ÇØ´ç À§Ä¡ÀÇ ³ëµå°¡ OpenList¿¡ Á¸ÀçÇÒ ¶§
-			//		- ´õ ÁÁÀº °æ·Î·Î ÇØ´ç À§Ä¡¸¦ ¹ß°ßÇß´Ù¸é °ªÀ» °»½ÅÇÑ´Ù.
-			// 2. ÇØ´ç À§Ä¡ÀÇ ³ëµå°¡ OpenList¿¡ ¾øÀ» ¶§
-			//		- »õ ³ëµå¸¦ »ı¼º ÈÄ, »õ·Î µî·ÏÇÑ´Ù.
-			auto prev = openList.find({ y,x });
-			if (prev != openList.end())
-			{
-				Node* prevNode = (*prev).second;
-				if (g + h >= prevNode->f)
-					break;
-				prevNode->g = g;
-				prevNode->f = g + h;
-				prevNode->parent = vNode;
-				prevNode->dir = EDir::LU;
-			}
-			else
-			{
-				// ÇØ´ç À§Ä¡¸¦ Ã³À½ ¹ß°ßÇß´Ù¸é ³ëµå »ı¼º ÈÄ OpenList¿¡ Ãß°¡
-				Node* nextVNode = new Node(vNode, EDir::LU, { y, x }, g, h);
-				openList[{y, x}] = nextVNode;
-
-				// ----------- searchGrid ·»´õ¸µ¿ë --------------
-				// - colorMap¿¡ ÇØ´ç ³ëµå Æ÷ÀÎÅÍ¿¡ ´ëÇÑ color µî·Ï
-				// - ÇØ´ç color¿¡ ´ëÇÑ ºê·¯½Ã gdi ¿ÀºêÁ§Æ® µî·Ï
-				COLORREF color = GenerateUniqueColor();
-				colorMap[nextVNode] = color;
-				colorBrushMap.insert({ color, CreateSolidBrush(color) });
-			}
-			break;
-		}
-
-		// ----------- searchGrid ·»´õ¸µ¿ë --------------
-		// - ÇØ´ç À§Ä¡¿¡ rendererÀÇ searchGrid¿¡ »ö»ó µî·Ï
-		renderer->searchGrid[y][x] = colorMap[vNode];
-		y--;
-		x--;
-	}
-}
-
-
-void CPathFinding::SearchCorner_LD(Node* vNode)
-{
-	int y = vNode->y + 1;
-	int x = vNode->x - 1;
-	double g;
-	double h;
-
-	while (1)
-	{
-		if (x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT)
-			break;
-		if (grid[y][x] == 1)
-			break;
-		// ÄÚ³Ê ¹ß°ß ¶Ç´Â ¸ñÀûÁö ¹ß°ß
-		bool isJumpPoint = false;
-		isJumpPoint |= (CheckObstacle(y, x + 1) && !CheckObstacle(y + 1, x + 1));
-		isJumpPoint |= (CheckObstacle(y - 1, x) && !CheckObstacle(y - 1, x - 1));
-
-		// ¼öÆò ¼öÁ÷ °Å¸®¿¡ ÄÚ³Ê È¤Àº ¸ñÀûÁö ¹ß°ß
-		isJumpPoint |= HasCorner_L(vNode, y, x);
-		isJumpPoint |= HasCorner_D(vNode, y, x);
-
-		if (isJumpPoint || (y == endPos.first && x == endPos.second))
-		{
-			if (bDistanceG_Manhattan)
-				g = vNode->g + GetManhattanDis({ vNode->y, vNode->x }, { y, x });
-			else
-				g = vNode->g + GetEuclideanDis({ vNode->y, vNode->x }, { y, x });
-			if (bDistanceH_Manhattan)
-				h = GetManhattanDis({ y, x }, endPos);
-			else
-				h = GetEuclideanDis({ y, x }, endPos);
-
-
-			// ÀÌ¹Ì ¹æ¹®ÇÑ ³ëµå´Â Å½»ö Á¦¿Ü (ÃÖ´Ü °æ·ÎÀÓÀ» º¸Àå)
-			if (closedList.find({ y,x }) != closedList.end())
-				break;
-
-			// 1. ÇØ´ç À§Ä¡ÀÇ ³ëµå°¡ OpenList¿¡ Á¸ÀçÇÒ ¶§
-			//		- ´õ ÁÁÀº °æ·Î·Î ÇØ´ç À§Ä¡¸¦ ¹ß°ßÇß´Ù¸é °ªÀ» °»½ÅÇÑ´Ù.
-			// 2. ÇØ´ç À§Ä¡ÀÇ ³ëµå°¡ OpenList¿¡ ¾øÀ» ¶§
-			//		- »õ ³ëµå¸¦ »ı¼º ÈÄ, »õ·Î µî·ÏÇÑ´Ù.
-			auto prev = openList.find({ y,x });
-			if (prev != openList.end())
-			{
-				Node* prevNode = (*prev).second;
-				if (g + h >= prevNode->f)
-					break;
-				prevNode->g = g;
-				prevNode->f = g + h;
-				prevNode->parent = vNode;
-				prevNode->dir = EDir::LD;
-			}
-			else
-			{
-				// ÇØ´ç À§Ä¡¸¦ Ã³À½ ¹ß°ßÇß´Ù¸é ³ëµå »ı¼º ÈÄ OpenList¿¡ Ãß°¡
-				Node* nextVNode = new Node(vNode, EDir::LD, { y, x }, g, h);
-				openList[{y, x}] = nextVNode;
-
-				// ----------- searchGrid ·»´õ¸µ¿ë --------------
-				// - colorMap¿¡ ÇØ´ç ³ëµå Æ÷ÀÎÅÍ¿¡ ´ëÇÑ color µî·Ï
-				// - ÇØ´ç color¿¡ ´ëÇÑ ºê·¯½Ã gdi ¿ÀºêÁ§Æ® µî·Ï
-				COLORREF color = GenerateUniqueColor();
-				colorMap[nextVNode] = color;
-				colorBrushMap.insert({ color, CreateSolidBrush(color) });
-			}
-			break;
-		}
-
-		// ----------- searchGrid ·»´õ¸µ¿ë --------------
-		// - ÇØ´ç À§Ä¡¿¡ rendererÀÇ searchGrid¿¡ »ö»ó µî·Ï
-		renderer->searchGrid[y][x] = colorMap[vNode];
-		y++;
-		x--;
 	}
 }
 
@@ -995,7 +528,7 @@ bool CPathFinding::HasCorner_R(Node* vNode, int sy, int sx)
 			break;
 		if (grid[y][x] == 1)
 			break;
-		// ÄÚ³Ê ¹ß°ß ¶Ç´Â ¸ñÀûÁö ¹ß°ß
+		// ì½”ë„ˆ ë°œê²¬ ë˜ëŠ” ëª©ì ì§€ ë°œê²¬
 		bool bHasCorner = false;
 		bHasCorner |= (CheckObstacle(y + 1, x) && !CheckObstacle(y + 1, x + 1));
 		bHasCorner |= (CheckObstacle(y - 1, x) && !CheckObstacle(y - 1, x + 1));
@@ -1003,14 +536,14 @@ bool CPathFinding::HasCorner_R(Node* vNode, int sy, int sx)
 		bool isGoal = (y == endPos.first && x == endPos.second);
 		if (bHasCorner || isGoal)
 		{
-			// ----------- searchGrid ·»´õ¸µ¿ë --------------
-			// - ÇØ´ç À§Ä¡¿¡ rendererÀÇ searchGrid¿¡ »ö»ó µî·Ï
+			// ----------- searchGrid ë Œë”ë§ìš© --------------
+			// - í•´ë‹¹ ìœ„ì¹˜ì— rendererì˜ searchGridì— ìƒ‰ìƒ ë“±ë¡
 			renderer->searchGrid[y][x] = colorMap[vNode];
 			return true;
 		}
 
-		// ----------- searchGrid ·»´õ¸µ¿ë --------------
-		// - ÇØ´ç À§Ä¡¿¡ rendererÀÇ searchGrid¿¡ »ö»ó µî·Ï
+		// ----------- searchGrid ë Œë”ë§ìš© --------------
+		// - í•´ë‹¹ ìœ„ì¹˜ì— rendererì˜ searchGridì— ìƒ‰ìƒ ë“±ë¡
 		renderer->searchGrid[y][x] = colorMap[vNode];
 		x++;
 	}
@@ -1029,7 +562,7 @@ bool CPathFinding::HasCorner_U(Node* vNode, int sy, int sx)
 		if (grid[y][x] == 1)
 			break;
 
-		// ÄÚ³Ê ¹ß°ß ¶Ç´Â ¸ñÀûÁö ¹ß°ß
+		// ì½”ë„ˆ ë°œê²¬ ë˜ëŠ” ëª©ì ì§€ ë°œê²¬
 		bool bHasCorner = false;
 		bHasCorner |= (CheckObstacle(y, x + 1) && !CheckObstacle(y - 1,x + 1));
 		bHasCorner |= (CheckObstacle(y, x - 1) && !CheckObstacle(y - 1, x - 1));
@@ -1037,14 +570,14 @@ bool CPathFinding::HasCorner_U(Node* vNode, int sy, int sx)
 		bool isGoal = (y == endPos.first && x == endPos.second);
 		if (bHasCorner || isGoal)
 		{
-			// ----------- searchGrid ·»´õ¸µ¿ë --------------
-			// - ÇØ´ç À§Ä¡¿¡ rendererÀÇ searchGrid¿¡ »ö»ó µî·Ï
+			// ----------- searchGrid ë Œë”ë§ìš© --------------
+			// - í•´ë‹¹ ìœ„ì¹˜ì— rendererì˜ searchGridì— ìƒ‰ìƒ ë“±ë¡
 			renderer->searchGrid[y][x] = colorMap[vNode];
 			return true;
 		}
 		
-		// ----------- searchGrid ·»´õ¸µ¿ë --------------
-		// - ÇØ´ç À§Ä¡¿¡ rendererÀÇ searchGrid¿¡ »ö»ó µî·Ï
+		// ----------- searchGrid ë Œë”ë§ìš© --------------
+		// - í•´ë‹¹ ìœ„ì¹˜ì— rendererì˜ searchGridì— ìƒ‰ìƒ ë“±ë¡
 		renderer->searchGrid[y][x] = colorMap[vNode];
 
 		y--;
@@ -1064,7 +597,7 @@ bool CPathFinding::HasCorner_L(Node* vNode, int sy, int sx)
 			break;
 		if (grid[y][x] == 1)
 			break;
-		// ÄÚ³Ê ¹ß°ß ¶Ç´Â ¸ñÀûÁö ¹ß°ß
+		// ì½”ë„ˆ ë°œê²¬ ë˜ëŠ” ëª©ì ì§€ ë°œê²¬
 		bool bHasCorner = false;
 		bHasCorner |= (CheckObstacle(y + 1, x) && !CheckObstacle(y + 1, x - 1));
 		bHasCorner |= (CheckObstacle(y - 1, x) && !CheckObstacle(y - 1, x - 1));
@@ -1072,14 +605,14 @@ bool CPathFinding::HasCorner_L(Node* vNode, int sy, int sx)
 		bool isGoal = (y == endPos.first && x == endPos.second);
 		if (bHasCorner || isGoal)
 		{
-			// ----------- searchGrid ·»´õ¸µ¿ë --------------
-			// - ÇØ´ç À§Ä¡¿¡ rendererÀÇ searchGrid¿¡ »ö»ó µî·Ï
+			// ----------- searchGrid ë Œë”ë§ìš© --------------
+			// - í•´ë‹¹ ìœ„ì¹˜ì— rendererì˜ searchGridì— ìƒ‰ìƒ ë“±ë¡
 			renderer->searchGrid[y][x] = colorMap[vNode];
 			return true;
 		}
 
-		// ----------- searchGrid ·»´õ¸µ¿ë --------------
-		// - ÇØ´ç À§Ä¡¿¡ rendererÀÇ searchGrid¿¡ »ö»ó µî·Ï
+		// ----------- searchGrid ë Œë”ë§ìš© --------------
+		// - í•´ë‹¹ ìœ„ì¹˜ì— rendererì˜ searchGridì— ìƒ‰ìƒ ë“±ë¡
 		renderer->searchGrid[y][x] = colorMap[vNode];
 		x--;
 	}
@@ -1098,7 +631,7 @@ bool CPathFinding::HasCorner_D(Node* vNode, int sy, int sx)
 		if (grid[y][x] == 1)
 			break;
 
-		// ÄÚ³Ê ¹ß°ß ¶Ç´Â ¸ñÀûÁö ¹ß°ß
+		// ì½”ë„ˆ ë°œê²¬ ë˜ëŠ” ëª©ì ì§€ ë°œê²¬
 		bool bHasCorner = false;
 		bHasCorner |= (CheckObstacle(y, x + 1) && !CheckObstacle(y + 1, x + 1));
 		bHasCorner |= (CheckObstacle(y, x - 1) && !CheckObstacle(y + 1, x - 1));
@@ -1106,14 +639,14 @@ bool CPathFinding::HasCorner_D(Node* vNode, int sy, int sx)
 		bool isGoal = (y == endPos.first && x == endPos.second);
 		if (bHasCorner || isGoal)
 		{
-			// ----------- searchGrid ·»´õ¸µ¿ë --------------
-			// - ÇØ´ç À§Ä¡¿¡ rendererÀÇ searchGrid¿¡ »ö»ó µî·Ï
+			// ----------- searchGrid ë Œë”ë§ìš© --------------
+			// - í•´ë‹¹ ìœ„ì¹˜ì— rendererì˜ searchGridì— ìƒ‰ìƒ ë“±ë¡
 			renderer->searchGrid[y][x] = colorMap[vNode];
 			return true;
 		}
 
-		// ----------- searchGrid ·»´õ¸µ¿ë --------------
-		// - ÇØ´ç À§Ä¡¿¡ rendererÀÇ searchGrid¿¡ »ö»ó µî·Ï
+		// ----------- searchGrid ë Œë”ë§ìš© --------------
+		// - í•´ë‹¹ ìœ„ì¹˜ì— rendererì˜ searchGridì— ìƒ‰ìƒ ë“±ë¡
 		renderer->searchGrid[y][x] = colorMap[vNode];
 
 		y++;
@@ -1150,7 +683,7 @@ int CPathFinding::GetManhattanDis(pair<int, int> _startPos, pair<int, int> _endP
 
 
 //---------------------------------------
-//-------- searchGrid ·£´õ¸µ ¿ë ---------
+//-------- searchGrid ëœë”ë§ ìš© ---------
 //---------------------------------------
 bool CPathFinding::IsWhiteColor(COLORREF c)
 {
@@ -1160,7 +693,7 @@ bool CPathFinding::IsWhiteColor(COLORREF c)
 
 	int avgRGB = (r + g + b) / 3;
 
-	// ¹à±â°¡ ³Ê¹« ³ô´Ù ¡æ °ÅÀÇ Èò»ö  (max¡Ã230)
+	// ë°ê¸°ê°€ ë„ˆë¬´ ë†’ë‹¤ â†’ ê±°ì˜ í°ìƒ‰  (maxâ‰¥230)
 	return (avgRGB >= 230);
 }
 
@@ -1168,7 +701,7 @@ COLORREF CPathFinding::GenerateUniqueColor()
 {
 	if (huePool.empty())
 	{
-		// 10µµ °£°İÀ¸·Î »ö»ó ÃßÃâ -> 36°³ÀÇ »öÀ» ¼ÅÇÃ ÈÄ ¹ø°¥¾Æ°¡¸ç »ç¿ëÇÒ °ÍÀÓ
+		// 10ë„ ê°„ê²©ìœ¼ë¡œ ìƒ‰ìƒ ì¶”ì¶œ -> 36ê°œì˜ ìƒ‰ì„ ì…”í”Œ í›„ ë²ˆê°ˆì•„ê°€ë©° ì‚¬ìš©í•  ê²ƒì„
 		for (int i = 0; i < 360; i += 10)
 			huePool.push_back(i);
 		std::shuffle(huePool.begin(), huePool.end(), std::mt19937{ std::random_device{}() });
@@ -1176,12 +709,12 @@ COLORREF CPathFinding::GenerateUniqueColor()
 
 	COLORREF clr;
 
-	do  // È¸»ö or Èò»öÀÌ¸é ´Ù½Ã »Ì±â
+	do  // íšŒìƒ‰ or í°ìƒ‰ì´ë©´ ë‹¤ì‹œ ë½‘ê¸°
 	{
 		int hue = huePool[hueIndex % huePool.size()];
 		++hueIndex;
 
-		// Ã¤µµ¡¤¸íµµ »ìÂ¦ ³ô¿©¼­ È¸»öÈ­ ¹æÁö
+		// ì±„ë„Â·ëª…ë„ ì‚´ì§ ë†’ì—¬ì„œ íšŒìƒ‰í™” ë°©ì§€
 		clr = HSVtoRGB(hue, 0.4, 0.9);
 
 	} while (IsWhiteColor(clr));

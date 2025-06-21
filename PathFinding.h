@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Define_Grid.h"
 #include <vector>
 #include <unordered_map>
@@ -6,7 +6,7 @@
 
 using namespace std;
 
-// Å¸ÀÏ ·»´õ¸µÀ» À§ÇÑ ÀÓ½Ã º¯¼ö
+// íƒ€ì¼ ë Œë”ë§ì„ ìœ„í•œ ì„ì‹œ ë³€ìˆ˜
 extern int g_gridSize;
 extern int g_scrollOffsetX;
 extern int g_scrollOffsetY;
@@ -50,7 +50,7 @@ public:
 };
 
 
-// unordered_map <pair<int,int>, Node*> ÇØ½Ã ÇÔ¼ö Á¤ÀÇ
+// unordered_map <pair<int,int>, Node*> í•´ì‹œ í•¨ìˆ˜ ì •ì˜
 struct PositionHash
 {
 	std::size_t operator()(const pair<int, int> pos) const
@@ -74,7 +74,7 @@ public:
 		bDistanceG_Manhattan = false;
 		bDistanceH_Manhattan = true;
 
-		// rendererÀÇ search Grid ÃÊ±âÈ­
+		// rendererì˜ search Grid ì´ˆê¸°í™”
 		memset(renderer->searchGrid, RGB(0, 0, 0), sizeof(renderer->searchGrid));
 	}
 
@@ -94,8 +94,8 @@ public:
 		for (Node* node : toDeleteClosedList)
 			delete node;
 
-		// searchGrid »ö»ó °ü·Ã (·»´õ¸µ ¿ë)
-		// - colorBrushMap¿¡ ÇÒ´çµÈ GDI ¿ÀºêÁ§Æ®(ºê·¯½Ã) delete
+		// searchGrid ìƒ‰ìƒ ê´€ë ¨ (ë Œë”ë§ ìš©)
+		// - colorBrushMapì— í• ë‹¹ëœ GDI ì˜¤ë¸Œì íŠ¸(ë¸ŒëŸ¬ì‹œ) delete
 		for (const auto& entry : colorBrushMap)
 		{
 			if (entry.second == NULL || entry.second == INVALID_HANDLE_VALUE)
@@ -124,15 +124,8 @@ public:
 	//-----------JPS-------------
 	void FindPath_JPS();
 	bool FindPath_JPS_OneStep();
-
-	void SearchCorner_R(Node* vNode);
-	void SearchCorner_U(Node* vNode);
-	void SearchCorner_L(Node* vNode);
-	void SearchCorner_D(Node* vNode);
-	void SearchCorner_RU(Node* vNode);
-	void SearchCorner_RD(Node* vNode);
-	void SearchCorner_LU(Node* vNode);
-	void SearchCorner_LD(Node* vNode);
+	
+	void SearchJumpPoint(Node* vNode, EDir searchDir);
 
 	bool HasCorner_R(Node* vNode, int sy, int sx);
 	bool HasCorner_U(Node* vNode, int sy, int sx);
@@ -141,7 +134,7 @@ public:
 
 	bool CheckObstacle(int y, int x);
 
-	// searchGrid »ö»ó °ü·Ã (·»´õ¸µ ¿ë)
+	// searchGrid ìƒ‰ìƒ ê´€ë ¨ (ë Œë”ë§ ìš©)
 	bool IsWhiteColor(COLORREF c);
 	COLORREF GenerateUniqueColor();
 	COLORREF HSVtoRGB(double h, double s, double v);
@@ -171,7 +164,7 @@ public:
 	bool bDistanceH_Manhattan;
 
 
-	// searchGrid »ö»ó °ü·Ã (·»´õ¸µ ¿ë)
+	// searchGrid ìƒ‰ìƒ ê´€ë ¨ (ë Œë”ë§ ìš©)
 	std::unordered_map<Node*, COLORREF> colorMap;
 	std::unordered_map<COLORREF, HBRUSH> colorBrushMap;
 	std::vector<int> huePool;
