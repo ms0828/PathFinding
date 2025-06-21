@@ -19,7 +19,7 @@ WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름�
 // 함수 선언
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
-
+// 화면 관련 변수
 char g_grid[GRID_HEIGHT][GRID_WIDTH];
 bool g_bErase = false;
 bool g_bDrag = false;
@@ -27,6 +27,11 @@ int g_gridSize = GRID_SIZE;
 int g_scrollOffsetX = 0;
 int g_scrollOffsetY = 0;
 
+// 자동화 관련 변수
+bool g_autoRunning = false;      // true  → 계속 반복
+bool g_testRunning = false;      // 현재 길찾기 수행 중
+
+// 전역 변수
 CPathFinding* pathFinding = nullptr;
 CPathFinding_Renderer* renderer;
 
@@ -175,7 +180,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             if (!g_autoRunning)          // (1) 자동 시작
             {
                 g_autoRunning = true;
-                if (!g_testInFlight)     //   - 테스트 중이 아니면 즉시 시작
+                if (!g_testRunning)     //   - 테스트 중이 아니면 즉시 시작
                     PostMessage(hWnd, WM_AUTOTEST, 0, 0);
             }
             else                         // (2) 중단 요청
@@ -258,8 +263,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     break;
     case WM_AUTOTEST:
         // 자동 실행 모드가 켜져 있어야만 새 사이클 시작
-        if (g_autoRunning && !g_testInFlight)
-            StartPathFindingTest(hWnd, pathFinding, renderer);
+        if (g_autoRunning && !g_testRunning)
+            StartPathFindingTest(hWnd);
         return 0;
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);

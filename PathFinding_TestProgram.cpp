@@ -5,11 +5,7 @@
 #include "PathFinding_Renderer.h"
 #include "PathFinding_TestProgram.h"
 
-
-bool   g_autoRunning = false;      // true  → 계속 반복
-bool   g_testInFlight = false;      // 현재 길찾기 수행 중?
 int regionId[GRID_HEIGHT][GRID_WIDTH];
-
 
 // -----------------------------------
 // 미로 자동 생성 관련
@@ -61,7 +57,7 @@ void GenerateMaze()
     carve(2, 2);   // 반드시 짝수 시작점
 
     // (3) 일부 벽을 무작위로 제거해 루프(사이클) 추가
-    int loopCount = (GRID_HEIGHT * GRID_WIDTH) / 100;  // 필요하면 비율 조절
+    int loopCount = (GRID_HEIGHT * GRID_WIDTH) / 50;  // 필요하면 비율 조절
     AddLoops(loopCount);
 }
 
@@ -171,7 +167,7 @@ int LabelRegions(Point reps[], int maxRegion)
                     {
                         int ny = p.y + dY[i];
                         int nx = p.x + dX[i];
-                        if (ny < 0 && ny >= GRID_HEIGHT && nx < 0 && nx >= GRID_WIDTH)
+                        if (ny < 0 || ny >= GRID_HEIGHT || nx < 0 || nx >= GRID_WIDTH)
                             continue;
                         if (g_grid[ny][nx] == PATH && regionId[ny][nx] == -1)
                         {
@@ -266,9 +262,9 @@ void GenerateCave()
 
 // ------------- 길 찾기 자동화 관련 ----------------
 
-void StartPathFindingTest(HWND hWnd, CPathFinding* pathFinding, CPathFinding_Renderer* renderer)
+void StartPathFindingTest(HWND hWnd)
 {
-    g_testInFlight = true;                 // 실행 중 플래그
+    g_testRunning = true;                 // 실행 중 플래그
 
     // 1) 새 미로 생성 
     if (rand() % 2 == 0)
@@ -277,18 +273,29 @@ void StartPathFindingTest(HWND hWnd, CPathFinding* pathFinding, CPathFinding_Ren
         GenerateCave();
 
     // 2) 랜덤 출발·도착 좌표 확보
-    auto RandomPoint = []() -> std::pair<int, int>
-        {
-            while (true)
-            {
-                int y = rand() % GRID_HEIGHT;
-                int x = rand() % GRID_WIDTH;
-                if (g_grid[y][x] == 0) return { y, x };
-            }
-        };
-
     std::pair<int, int> startPos, endPos;
-    do { startPos = RandomPoint(); endPos = RandomPoint(); } while (startPos == endPos);
+    // startPos 설정
+    while (true)
+    {
+        int y = rand() % GRID_HEIGHT;
+        int x = rand() % GRID_WIDTH;
+        if (g_grid[y][x] == 0)
+        {
+            startPos = std::make_pair(y, x);
+            break;
+        }
+    }
+    // endPos 설정 (startPos와 다를 때까지 반복)
+    while (true)
+    {
+        int y = rand() % GRID_HEIGHT;
+        int x = rand() % GRID_WIDTH;
+        if (g_grid[y][x] == 0 && !(y == startPos.first && x == startPos.second))
+        {
+            endPos = std::make_pair(y, x);
+            break;
+        }
+    }
 
     if (pathFinding) 
     {
@@ -308,7 +315,7 @@ void StartPathFindingTest(HWND hWnd, CPathFinding* pathFinding, CPathFinding_Ren
         g_autoRunning = false;            // 실패 → 반복 중단
     }
 
-    g_testInFlight = false;              // 실행 완료
+    g_testRunning = false;              // 실행 완료
 
     // 7) 다음 테스트 예약
     if (g_autoRunning)                   // 자동 모드가 여전히 true 면

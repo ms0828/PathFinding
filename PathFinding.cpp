@@ -247,7 +247,11 @@ int CPathFinding::FindPath_JPS_OneStep()
 		// - 해당 color에 대한 브러시 gdi 오브젝트 등록
 		COLORREF color = GenerateUniqueColor();
 		colorMap[startNode] = color;
-		colorBrushMap.insert({ color, CreateSolidBrush(color)});
+		if (colorBrushMap.find(color) == colorBrushMap.end())
+		{
+			HBRUSH hBrush = CreateSolidBrush(color);
+			colorBrushMap[color] = hBrush;
+		}
 	}
 
 	
@@ -382,8 +386,10 @@ int CPathFinding::FindPath_JPS_OneStep()
 	return 1;
 }
 
+// 해당 방향으로 점프 포인트(오픈 리스트에 담을 노드)가 있는지 검사
 void CPathFinding::SearchJumpPoint(Node* vNode, EDir searchDir)
 {
+	// 탐색 시작 위치
 	int y, x;
 	switch (searchDir)
 	{
@@ -437,17 +443,17 @@ void CPathFinding::SearchJumpPoint(Node* vNode, EDir searchDir)
 			isJumpPoint |= HasCorner(vNode, EDir::R, y, x);
 			isJumpPoint |= HasCorner(vNode, EDir::D, y, x);
 			break;
-		case EDir::LU:
-			isJumpPoint |= (CheckObstacle(y, x + 1) && !CheckObstacle(y - 1, x + 1));
-			isJumpPoint |= (CheckObstacle(y + 1, x) && !CheckObstacle(y + 1, x - 1));
-			isJumpPoint |= HasCorner(vNode, EDir::L, y, x);
-			isJumpPoint |= HasCorner(vNode, EDir::U, y, x);
-			break;
 		case EDir::LD:
 			isJumpPoint |= (CheckObstacle(y, x + 1) && !CheckObstacle(y + 1, x + 1));
 			isJumpPoint |= (CheckObstacle(y - 1, x) && !CheckObstacle(y - 1, x - 1));
 			isJumpPoint |= HasCorner(vNode, EDir::L, y, x);
 			isJumpPoint |= HasCorner(vNode, EDir::D, y, x);
+			break;
+		case EDir::LU:
+			isJumpPoint |= (CheckObstacle(y, x + 1) && !CheckObstacle(y - 1, x + 1));
+			isJumpPoint |= (CheckObstacle(y + 1, x) && !CheckObstacle(y + 1, x - 1));
+			isJumpPoint |= HasCorner(vNode, EDir::L, y, x);
+			isJumpPoint |= HasCorner(vNode, EDir::U, y, x);
 			break;
 		}
 		
@@ -498,13 +504,11 @@ void CPathFinding::SearchJumpPoint(Node* vNode, EDir searchDir)
 				// - 해당 color에 대한 브러시 gdi 오브젝트 등록
 				COLORREF color = GenerateUniqueColor();
 				colorMap[nextVNode] = color;
-
 				if (colorBrushMap.find(color) == colorBrushMap.end())
 				{
 					HBRUSH hBrush = CreateSolidBrush(color);
 					colorBrushMap[color] = hBrush;
 				}
-
 			}
 			break;
 		}
