@@ -16,6 +16,7 @@ void CPathFinding_Renderer::ReSize(HDC hdc)
 }
 
 
+
 void CPathFinding_Renderer::Rendering(CPathFinding* pathFinding)
 {
 	// 메모리 DC 클리어 및 메모리 DC에 그림 그리기
@@ -24,14 +25,14 @@ void CPathFinding_Renderer::Rendering(CPathFinding* pathFinding)
 	RenderObstacle();
 	if (pathFinding != nullptr)
 	{
+		RenderSearchGrid(pathFinding);
 		RenderOpenList(pathFinding);
 		RenderClosedList(pathFinding);
 		RenderStartPos(pathFinding);
 		if (pathFinding->bHasGoal)
 			RenderEndPos(pathFinding);
-
-		if (pathFinding->destNode != nullptr)
-			RenderPath(pathFinding->destNode);
+		if (!pathFinding->path.empty())
+			RenderPath(pathFinding);
 		RenderParentNode(pathFinding);
 	}
 	RenderInfoPanel(pathFinding);
@@ -120,9 +121,13 @@ void CPathFinding_Renderer::RenderInfoPanel(CPathFinding* pathFinding)
 		const wchar_t* hType = pathFinding->bDistanceH_Manhattan ? L"맨하튼" : L"뉴클리드";
 
 		swprintf_s(distanceInfo, L"G - %s, H - %s", gType, hType);
-
 		// 한 줄 더 아래 출력
-		TextOutW(hMemDC, panelX + 5, panelY + 5 + (lineCount + 1) * lineHeight, distanceInfo, lstrlenW(distanceInfo));
+		TextOutW(hMemDC, panelX + 5, panelY + 5 + (lineCount++ + 1) * lineHeight, distanceInfo, lstrlenW(distanceInfo));
+	
+		wchar_t openListInfo[100];
+		swprintf_s(openListInfo, L"%s : %zu", L"오픈리스트 개수", pathFinding->openList.size());
+		// 한 줄 더 아래 출력
+		TextOutW(hMemDC, panelX + 5, panelY + 5 + (lineCount + 1) * lineHeight, openListInfo, lstrlenW(openListInfo));
 	}
 }
 
@@ -153,6 +158,37 @@ void CPathFinding_Renderer::RenderEndPos(CPathFinding* pathFinding)
 
 	Rectangle(hMemDC, gridX, gridY, gridX + g_gridSize + 2, gridY + g_gridSize + 2);
 	SelectObject(hMemDC, hOldBrush);
+}
+
+// JPS 전용
+void CPathFinding_Renderer::RenderSearchGrid(CPathFinding* pathFinding)
+{
+	for (int y = 0; y < GRID_HEIGHT; ++y)
+	{
+		for (int x = 0; x < GRID_WIDTH; ++x)
+		{
+			COLORREF color = searchGrid[y][x];
+
+			// 색상이 지정되지 않은 셀은 건너뜀
+			if (color == RGB(0, 0, 0))
+				continue;
+			
+			HBRUSH hBrush = pathFinding->colorBrushMap[color];
+			HBRUSH hOldBrush = (HBRUSH)SelectObject(hMemDC, hBrush);
+			SelectObject(hMemDC, GetStockObject(NULL_PEN));
+
+			// 현재 셀의 위치 계산 (스크롤 오프셋 반영)
+			int left = x * g_gridSize + g_scrollOffsetX;
+			int top = y * g_gridSize + g_scrollOffsetY;
+			int right = left + g_gridSize;
+			int bottom = top + g_gridSize;
+
+			Rectangle(hMemDC, left, top, right, bottom);
+
+			SelectObject(hMemDC, hOldBrush);
+		}
+	}
+	
 }
 
 void CPathFinding_Renderer::RenderOpenList(CPathFinding* pathFinding)
@@ -191,37 +227,38 @@ void CPathFinding_Renderer::RenderClosedList(CPathFinding* pathFinding)
 }
 
 
-void CPathFinding_Renderer::RenderPath(Node* destNode)
+void CPathFinding_Renderer::RenderPath(CPathFinding* pathFinding)
 {
-	if (destNode == nullptr)
+	if (pathFinding->path.empty())
 		return;
 
 	// 빨간색 선을 위한 펜
 	HPEN hRedPen = CreatePen(PS_SOLID, 2, RGB(255, 0, 0));
 	HPEN hOldPen = (HPEN)SelectObject(hMemDC, hRedPen);
 
-	Node* current = destNode;
-	while (current->parent != nullptr)
+	for (int i = 0; i < pathFinding->path.size() - 1; ++i)
 	{
-		// 현재 노드 좌표 중심
-		int x1 = current->x * g_gridSize + g_gridSize / 2 + g_scrollOffsetX;
-		int y1 = current->y * g_gridSize + g_gridSize / 2 + g_scrollOffsetY;
+		int y1 = pathFinding->path[i].first;
+		int x1 = pathFinding->path[i].second;
+		int y2 = pathFinding->path[i + 1].first;
+		int x2 = pathFinding->path[i + 1].second;
 
-		// 부모 노드 좌표 중심
-		int x2 = current->parent->x * g_gridSize + g_gridSize / 2 + g_scrollOffsetX;
-		int y2 = current->parent->y * g_gridSize + g_gridSize / 2 + g_scrollOffsetY;
+		int screenX1 = x1 * g_gridSize + g_gridSize / 2 + g_scrollOffsetX;
+		int screenY1 = y1 * g_gridSize + g_gridSize / 2 + g_scrollOffsetY;
 
-		// 선 그리기
-		MoveToEx(hMemDC, x1, y1, NULL);
-		LineTo(hMemDC, x2, y2);
+		int screenX2 = x2 * g_gridSize + g_gridSize / 2 + g_scrollOffsetX;
+		int screenY2 = y2 * g_gridSize + g_gridSize / 2 + g_scrollOffsetY;
 
-		current = current->parent;
+		MoveToEx(hMemDC, screenX1, screenY1, NULL);
+		LineTo(hMemDC, screenX2, screenY2);
 	}
 
 	// 펜 정리
 	SelectObject(hMemDC, hOldPen);
 	DeleteObject(hRedPen);
 }
+
+
 
 void CPathFinding_Renderer::RenderParentNode(CPathFinding* pathFinding)
 {

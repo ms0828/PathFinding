@@ -33,12 +33,13 @@ public:
 		hStartPosBrush = CreateSolidBrush(RGB(0, 200, 0)); // green
 		hEndPosBrush = CreateSolidBrush(RGB(200, 0, 0)); // red
 
+		memset(searchGrid, RGB(0, 0, 0), sizeof(searchGrid));
 	}
 
 	~CPathFinding_Renderer()
 	{
 		SelectObject(hMemDC, hMemDCBitMap_old);
-		DeleteObject(hMemDC);
+		DeleteDC(hMemDC);
 		DeleteObject(hMemDCBitMap);
 
 		DeleteObject(hGridPen);
@@ -60,7 +61,8 @@ public:
 	void RenderOpenList(CPathFinding* pathFinding);
 	void RenderClosedList(CPathFinding* pathFinding);
 	void RenderParentNode(CPathFinding* pathFinding);
-	void RenderPath(Node* destNode);
+	void RenderPath(CPathFinding* pathFinding);
+	void RenderSearchGrid(CPathFinding* pathFinding); // JPS Àü¿ë
 	void RenderNodeInfo(Node* node);
 
 public:
@@ -78,5 +80,5 @@ public:
 	HPEN hGridPen;
 
 	char(*grid)[GRID_WIDTH];
-
+	COLORREF searchGrid[GRID_HEIGHT][GRID_WIDTH];
 };

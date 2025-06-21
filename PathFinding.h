@@ -1,18 +1,36 @@
 #pragma once
 #include "Define_Grid.h"
-#include <Windows.h>
 #include <vector>
 #include <unordered_map>
 #include "PathFinding_Renderer.h"
 
 using namespace std;
 
+// 타일 렌더링을 위한 임시 변수
+extern int g_gridSize;
+extern int g_scrollOffsetX;
+extern int g_scrollOffsetY;
+
+enum EDir
+{
+	DEFAULT = 0,
+	R,
+	U,
+	L,
+	D,
+	RU,
+	RD,
+	LD,
+	LU
+};
+
 class Node
 {
 public:
-	Node(Node* _parent, pair<int,int> pos, double _g, double _h)
+	Node(Node* _parent, EDir _dir, pair<int,int> pos, double _g, double _h)
 	{
 		parent = _parent;
+		dir = _dir;
 		x = pos.second;
 		y = pos.first;
 		g = _g;
@@ -20,8 +38,10 @@ public:
 		f = g + h;
 	}
 
+	
 public:
 	Node* parent;
+	EDir dir;
 	int x;
 	int y;
 	double g;
@@ -29,17 +49,8 @@ public:
 	double f;
 };
 
-// unordered_set<Node*> 해시 함수 정의
-struct NodePtrHash
-{
-	std::size_t operator()(const Node* node) const
-	{
-		return std::hash<int>()(node->x) ^ (std::hash<int>()(node->y) << 1);
-	}
-};
 
-
-// unordered_map, set <pair<int,int>> 해시 함수 정의
+// unordered_map <pair<int,int>, Node*> 해시 함수 정의
 struct PositionHash
 {
 	std::size_t operator()(const pair<int, int> pos) const
@@ -62,6 +73,9 @@ public:
 		destNode = nullptr;
 		bDistanceG_Manhattan = false;
 		bDistanceH_Manhattan = true;
+
+		// renderer의 search Grid 초기화
+		memset(renderer->searchGrid, RGB(0, 0, 0), sizeof(renderer->searchGrid));
 	}
 
 	~CPathFinding()
@@ -80,21 +94,61 @@ public:
 		for (Node* node : toDeleteClosedList)
 			delete node;
 
+		// searchGrid 색상 관련 (렌더링 용)
+		// - colorBrushMap에 할당된 GDI 오브젝트(브러시) delete
+		for (const auto& entry : colorBrushMap)
+		{
+			if (entry.second == NULL || entry.second == INVALID_HANDLE_VALUE)
+				continue;
+			DeleteObject(entry.second);			
+		}
+		colorBrushMap.clear();
 	}
 
 	void Init();
 
+	bool SetEndPos(pair<int, int> _endPos);
+
 	Node* FindMinNodeInOpenList();
 
-	bool SetEndPos(pair<int, int> _endPos);
-	
-	void FindPath();
-	
-	bool FindPath_OneStep();
+	void CreatePath();
 
-	double GetEuclideanDis(pair<int,int> _startPos, pair<int,int> _endPos);
+	double GetEuclideanDis(pair<int, int> _startPos, pair<int, int> _endPos);
+
 	int GetManhattanDis(pair<int, int> _startPos, pair<int, int> _endPos);
 
+	//-----------AStar-------------
+	void FindPath_AStar();
+	bool FindPath_AStar_OneStep();
+
+	//-----------JPS-------------
+	void FindPath_JPS();
+	bool FindPath_JPS_OneStep();
+
+	void SearchCorner_R(Node* vNode);
+	void SearchCorner_U(Node* vNode);
+	void SearchCorner_L(Node* vNode);
+	void SearchCorner_D(Node* vNode);
+	void SearchCorner_RU(Node* vNode);
+	void SearchCorner_RD(Node* vNode);
+	void SearchCorner_LU(Node* vNode);
+	void SearchCorner_LD(Node* vNode);
+
+	bool HasCorner_R(Node* vNode, int sy, int sx);
+	bool HasCorner_U(Node* vNode, int sy, int sx);
+	bool HasCorner_L(Node* vNode, int sy, int sx);
+	bool HasCorner_D(Node* vNode, int sy, int sx);
+
+	bool CheckObstacle(int y, int x);
+
+	// searchGrid 색상 관련 (렌더링 용)
+	bool IsWhiteColor(COLORREF c);
+	COLORREF GenerateUniqueColor();
+	COLORREF HSVtoRGB(double h, double s, double v);
+
+
+
+	
 
 public:
 
@@ -107,7 +161,7 @@ public:
 	
 	std::unordered_map<pair<int, int>, Node*, PositionHash> openList;
 	std::unordered_map<pair<int, int>, Node*, PositionHash> closedList;
-
+	std::vector<pair<int, int>> path;
 
 	bool bHasGoal;
 	bool bFirstStep;
@@ -115,4 +169,12 @@ public:
 
 	bool bDistanceG_Manhattan;
 	bool bDistanceH_Manhattan;
+
+
+	// searchGrid 색상 관련 (렌더링 용)
+	std::unordered_map<Node*, COLORREF> colorMap;
+	std::unordered_map<COLORREF, HBRUSH> colorBrushMap;
+	std::vector<int> huePool;
+	int hueIndex = 0;
+
 };

@@ -133,6 +133,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             if (g_grid[yIdx][xIdx] == 1)
                 break;
             pathFinding->SetEndPos({ yIdx, xIdx });
+            pathFinding->Init();
             InvalidateRect(hWnd, NULL, false);
         }
     }
@@ -175,11 +176,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
         case '3':
             if (pathFinding)
-                pathFinding->FindPath();
+                pathFinding->FindPath_JPS();
             break;
         case '4':
             if (pathFinding)
-                pathFinding->FindPath_OneStep();
+                pathFinding->FindPath_JPS_OneStep();
             break;
         case '5':
             if (pathFinding)
@@ -235,6 +236,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     break;
     case WM_DESTROY:
         delete renderer;
+        if (pathFinding != nullptr)
+            delete pathFinding;
         PostQuitMessage(0);
         break;
     case WM_SIZE:
