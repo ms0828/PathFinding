@@ -122,8 +122,8 @@ public:
 	bool FindPath_AStar_OneStep();
 
 	//-----------JPS-------------
-	void FindPath_JPS();
-	bool FindPath_JPS_OneStep();
+	bool FindPath_JPS();
+	int FindPath_JPS_OneStep();  // 0 : 실패, 1 : 한 싸이클 성공, 2 : 목적지 찾음 
 	
 	void SearchJumpPoint(Node* vNode, EDir searchDir);
 

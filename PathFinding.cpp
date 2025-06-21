@@ -30,9 +30,7 @@ void CPathFinding::Init()
 
 	// searchNode 렌더링 관련 초기화
 	memset(renderer->searchGrid, RGB(0, 0, 0), sizeof(renderer->searchGrid));
-	colorMap.clear();
-	huePool.clear();
-
+	
 	// - colorBrushMap에 할당된 GDI 오브젝트(브러시) delete
 	for (const auto& entry : colorBrushMap)
 	{
@@ -41,6 +39,8 @@ void CPathFinding::Init()
 		DeleteObject(entry.second);
 	}
 	colorBrushMap.clear();
+	colorMap.clear();
+	huePool.clear();
 }
 
 
@@ -208,20 +208,27 @@ bool CPathFinding::FindPath_AStar_OneStep()
 	return false;
 }
 
-void CPathFinding::FindPath_JPS()
+bool CPathFinding::FindPath_JPS()
 {
+	int ret = 0;
 	while (1)
 	{
-		if (FindPath_JPS_OneStep())
+		ret = FindPath_JPS_OneStep();
+		if (ret == 1)
+			continue;
+		else
 			break;
 	}
-	return;
+	if (ret == 0)
+		return false;
+	else
+		return true;
 }
 
-bool CPathFinding::FindPath_JPS_OneStep()
+int CPathFinding::FindPath_JPS_OneStep()
 {
 	if (bHasGoal == false || destNode != nullptr)
-		return true;
+		return 0;
 
 	// 첫 싸이클 예외 처리
 	if (bFirstStep)
@@ -244,10 +251,9 @@ bool CPathFinding::FindPath_JPS_OneStep()
 	}
 
 	
-
+	// OpenList에서 가장 비용이 작은 노드를 추출
 	if (!openList.empty())
 	{
-		// OpenList에서 가장 비용이 작은 노드를 추출
 		Node* vNode = FindMinNodeInOpenList();
 		openList.erase({ vNode->y, vNode->x });
 
@@ -257,7 +263,8 @@ bool CPathFinding::FindPath_JPS_OneStep()
 			destNode = vNode;
 			closedList[{vNode->y, vNode->x}] = vNode;
 			CreatePath();
-			return true;
+			renderer->Rendering(this);
+			return 2;
 		}
 
 		// 방문 로직
@@ -370,9 +377,9 @@ bool CPathFinding::FindPath_JPS_OneStep()
 	}
 
 	if (openList.empty())
-		return true;
+		return 0;
 
-	return false;
+	return 1;
 }
 
 void CPathFinding::SearchJumpPoint(Node* vNode, EDir searchDir)
@@ -491,7 +498,13 @@ void CPathFinding::SearchJumpPoint(Node* vNode, EDir searchDir)
 				// - 해당 color에 대한 브러시 gdi 오브젝트 등록
 				COLORREF color = GenerateUniqueColor();
 				colorMap[nextVNode] = color;
-				colorBrushMap.insert({ color, CreateSolidBrush(color) });
+
+				if (colorBrushMap.find(color) == colorBrushMap.end())
+				{
+					HBRUSH hBrush = CreateSolidBrush(color);
+					colorBrushMap[color] = hBrush;
+				}
+
 			}
 			break;
 		}

@@ -4,9 +4,9 @@
 
 void CPathFinding_Renderer::ReSize(HDC hdc)
 {
-	SelectObject(hMemDC, hMemDCBitMap_old);
-	DeleteObject(hMemDC);
-	DeleteObject(hMemDCBitMap);
+	SelectObject(hMemDC, hMemDCBitMap_old);  // 비트맵 복원
+	DeleteObject(hMemDCBitMap);              // 비트맵 삭제
+	DeleteDC(hMemDC);                        // DC 삭제
 
 	GetClientRect(hWnd, &memDCRect);
 	hMemDCBitMap = CreateCompatibleBitmap(hdc, memDCRect.right, memDCRect.bottom);

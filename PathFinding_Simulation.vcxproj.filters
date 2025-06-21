@@ -36,6 +36,9 @@
     <ClInclude Include="PathFinding.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="PathFinding_TestProgram.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PathFinding_Simulation.cpp">
@@ -45,6 +48,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="PathFinding_Renderer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="PathFinding_TestProgram.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

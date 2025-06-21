@@ -5,6 +5,7 @@
 #include "PathFinding_Simulation.h"
 #include "PathFinding.h"
 #include "PathFinding_Renderer.h"
+#include "PathFinding_TestProgram.h"
 #include "Define_Grid.h"
 
 #define MAX_LOADSTRING 100
@@ -15,29 +16,25 @@ HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 
-
-char g_grid[GRID_HEIGHT][GRID_WIDTH];
-bool g_bErase = false;
-bool g_bDrag = false;
-
-
-int g_gridSize = GRID_SIZE;
-int g_scrollOffsetX = 0;
-int g_scrollOffsetY = 0;
-
-
 // 함수 선언
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 
+char g_grid[GRID_HEIGHT][GRID_WIDTH];
+bool g_bErase = false;
+bool g_bDrag = false;
+int g_gridSize = GRID_SIZE;
+int g_scrollOffsetX = 0;
+int g_scrollOffsetY = 0;
+
 CPathFinding* pathFinding = nullptr;
 CPathFinding_Renderer* renderer;
+
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int       nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
-
 
     // 전역 문자열 초기화
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -174,8 +171,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
         switch (wParam)
         {
+        case '0':
+            if (!g_autoRunning)          // (1) 자동 시작
+            {
+                g_autoRunning = true;
+                if (!g_testInFlight)     //   - 테스트 중이 아니면 즉시 시작
+                    PostMessage(hWnd, WM_AUTOTEST, 0, 0);
+            }
+            else                         // (2) 중단 요청
+            {
+                g_autoRunning = false;   //   - 현 사이클 끝나면 멈춤
+            }
+            break;
         case '3':
-            if (pathFinding)
+           if (pathFinding)
                 pathFinding->FindPath_JPS();
             break;
         case '4':
@@ -247,6 +256,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         ReleaseDC(hWnd, hdc);
     }
     break;
+    case WM_AUTOTEST:
+        // 자동 실행 모드가 켜져 있어야만 새 사이클 시작
+        if (g_autoRunning && !g_testInFlight)
+            StartPathFindingTest(hWnd, pathFinding, renderer);
+        return 0;
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }

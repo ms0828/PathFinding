@@ -132,6 +132,7 @@
     <ClInclude Include="PathFinding.h" />
     <ClInclude Include="PathFinding_Renderer.h" />
     <ClInclude Include="PathFinding_Simulation.h" />
+    <ClInclude Include="PathFinding_TestProgram.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -139,6 +140,7 @@
     <ClCompile Include="PathFinding.cpp" />
     <ClCompile Include="PathFinding_Renderer.cpp" />
     <ClCompile Include="PathFinding_Simulation.cpp" />
+    <ClCompile Include="PathFinding_TestProgram.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PathFinding_Simulation.rc" />
